@@ -34,12 +34,12 @@ bool GameLayer::init()
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Point origin = Director::getInstance()->getVisibleOrigin();
 	//背景初始化
-	gameBackground= Sprite::create("HelloWorld.png");
+	gameBackground= Sprite::create("bg.jpg");
 	gameBackground->setPosition(Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 	this->addChild(gameBackground, 0);
 
 	//人物初始化
-	me = Sprite::create("CloseSelected.png");
+	me = Sprite::create("icon4.jpg");
 	me->setPosition(0, 0);
 	this->addChild(me, 1);
 
