@@ -55,16 +55,36 @@ bool GameLayer::init()
 	
 	//建立websocket
 	_wsiClient = new cocos2d::network::WebSocket();
-	_wsiClient->init(*this, "ws://localhost:8000");
+	_wsiClient->init(*this, "ws://166.111.80.54:7000/echo");
 	return true;
 }
+
+
 
 bool GameLayer::onTouchBegan(Touch* touch, Event* unused) 
 {
 	auto location = touch->getLocation();
 	me->runAction(MoveTo::create(0.3, location));	
 	sendMessage("Test usage");
+	sendMessage("broadcast:Test usage");
+	jsonTest();
 	return true;
+}
+
+void GameLayer:: jsonTest(){
+	Document doc;
+	Document::AllocatorType& allocator = doc.GetAllocator();
+	doc.SetObject();
+	JsonValue username;
+	username = "wangxiyang";
+	doc.AddMember("username", username, allocator);
+	//doc.AddMember("username:", JsonValue().SetString("wangxiyang").Move(), allocator);
+	doc.AddMember("x", JsonValue(1).Move(), allocator);
+	doc.AddMember("y", JsonValue(2).Move(), allocator);
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	doc.Accept(writer);
+	sendMessage(buffer.GetString());
 }
 
 void GameLayer::sendMessage(String message)
@@ -86,6 +106,9 @@ void GameLayer::closeSocket()
 void GameLayer::onOpen(cocos2d::network::WebSocket* ws)
 {
     CCLOG("OnOpen");
+	srand(time(0));
+	std::string name = StringUtils::format("name:wxy%d", rand() % 100);
+	sendMessage(name);
 }
  
 // 接收消息处理函数
