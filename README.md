@@ -28,10 +28,58 @@
 -  每个客户端有一个选举按钮, 点击就发送选举消息 elect(ID)
 -  服务器完成选举, 给选举成功的人返回消息
 -  选举成功的人当选(换个头像?)
+-  可比较的列表
+-  当前最大
+-  比较次数
+-  每次比完都要更新这三个值
 
 ##开密码箱
 
 -  每个客户端有一个密码箱按钮, 点击申请开密码箱给服务器发消息 openBox(ID)
 -  当服务器收到足够多开箱子消息的时候(维护一个队列?)完成解密操作, 给客户端发消息打开箱子
 -  客户端弹窗..
-- 
+
+{
+id: string
+action: string [login, move, auth, auth2]
+msg: json
+}
+
+{
+action: string [create, move, auth, auth2]
+msg: json
+}
+
+
+login
+{
+    publicKey: ,
+    id: ,
+}
+
+move
+{
+    x: ,
+    y:
+}
+
+auth
+{
+    target: ,
+
+}
+
+create
+{
+    id: ,
+    x: ,
+    y: 
+}
+
+move
+{
+    id: ,
+    x: ,
+    y:
+}
+
