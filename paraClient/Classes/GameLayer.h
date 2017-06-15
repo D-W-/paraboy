@@ -4,8 +4,13 @@
 #include "cocos2d.h"
 #include "network/WebSocket.h"
 #include "string"
+#include "json/document.h"
+#include "json/writer.h"
+#include "json/stringbuffer.h"
 
 USING_NS_CC;
+using namespace rapidjson;
+typedef rapidjson::Value JsonValue;
 
 class GameLayer : public Layer, public cocos2d::network::WebSocket::Delegate
 {
@@ -31,7 +36,7 @@ private:
 	Sprite* gameBackground;
 	Sprite* me;
 	Vector<Sprite*> others;
-
+	void jsonTest();
 	cocos2d::network::WebSocket* _wsiClient;
 
 };
