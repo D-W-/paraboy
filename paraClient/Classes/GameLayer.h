@@ -20,12 +20,14 @@ public:
 	static Scene* createScene();
 	CREATE_FUNC(GameLayer);
 
+	void createButton(Ref* pSender);
+
 	void sendMessage(String message);
 	void closeSocket();
 
 	virtual bool init() override;
 	virtual bool onTouchBegan(Touch *touch, Event *unused) override;
-	//virtual void onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)override;
+	virtual void onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)override;
 	virtual void onOpen(cocos2d::network::WebSocket* ws);
 	virtual void onMessage(cocos2d::network::WebSocket* ws, const cocos2d::network::WebSocket::Data& data);
 	virtual void onClose(cocos2d::network::WebSocket* ws);
@@ -34,7 +36,7 @@ public:
 
 private:
 	Sprite* gameBackground;
-	Sprite* me;
+	MenuItemImage* me;
 	Vector<Sprite*> others;
 	void jsonTest();
 	cocos2d::network::WebSocket* _wsiClient;

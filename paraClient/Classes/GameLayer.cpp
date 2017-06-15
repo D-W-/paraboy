@@ -39,9 +39,13 @@ bool GameLayer::init()
 	this->addChild(gameBackground, 0);
 
 	//人物初始化
-	me = Sprite::create("icon4.jpg");
+	me = MenuItemImage::create("icon4.jpg", "icon4.jpg", CC_CALLBACK_1(GameLayer::createButton, this));
 	me->setPosition(0, 0);
-	this->addChild(me, 1);
+	//this->addChild(me, 1);
+
+	CCMenu* menu = CCMenu::create(me, NULL);
+	menu->setPosition(0, 0);
+	this->addChild(menu, 1);
 
 	// bind touch event实现触摸效果
 	auto touchListener = EventListenerTouchOneByOne::create();
@@ -71,6 +75,26 @@ bool GameLayer::onTouchBegan(Touch* touch, Event* unused)
 	return true;
 }
 
+void GameLayer::onKeyReleased(EventKeyboard::KeyCode keycode, Event * event)
+{
+	int offsetX = 0, offsetY = 0;
+	switch (keycode) {
+		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+			offsetX = -144;
+			break;
+		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+			offsetX = 144;
+			break;
+		case EventKeyboard::KeyCode::KEY_UP_ARROW:
+			offsetY = 144;
+			break;
+		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+			offsetY = -144;
+	}
+	auto moveTo = MoveTo::create(0.3, Vec2(me->getPositionX() + offsetX, me->getPositionY() + offsetY));
+	me->runAction(moveTo);
+}
+
 void GameLayer:: jsonTest(){
 	Document doc;
 	Document::AllocatorType& allocator = doc.GetAllocator();
@@ -85,6 +109,11 @@ void GameLayer:: jsonTest(){
 	Writer<StringBuffer> writer(buffer);
 	doc.Accept(writer);
 	sendMessage(buffer.GetString());
+}
+
+void GameLayer::createButton(Ref* pSender)
+{
+	CCLOG("click");
 }
 
 void GameLayer::sendMessage(String message)
