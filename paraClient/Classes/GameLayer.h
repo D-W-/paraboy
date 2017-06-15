@@ -41,5 +41,15 @@ private:
 	void jsonTest();
 	cocos2d::network::WebSocket* _wsiClient;
 
+// added by wangxiyang
+public:
+// send actions
+	void sendLogin(String id, int publicKey_d, int publicKey_n);
+	void sendMove(int x, int y);
+
+// receive actions
+	void recvCreate(JsonValue msg);
+	void recvMove(JsonValue msg);
+	
 };
 #endif /* defined(__GAMELAYER_H__) */
