@@ -41,6 +41,7 @@ private:
 	MenuItemImage* buttonCompare;
 	MenuItemImage* buttonOpenBox;
 	Vector<Sprite*> others;
+	String my_id;
 	void jsonTest();
 	cocos2d::network::WebSocket* _wsiClient;
 
@@ -54,5 +55,7 @@ public:
 	void recvCreate(JsonValue msg);
 	void recvMove(JsonValue msg);
 	
+	void doCreate(String id, int px, int py, int publicKey_d,int publicKey_n);
+	void doMove(String id, int px, int py);
 };
 #endif /* defined(__GAMELAYER_H__) */

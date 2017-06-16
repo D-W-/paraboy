@@ -50,10 +50,10 @@ def remove_ws(ws):
 
 def get_init_pos():
     flag = True
-    x, y = randint(0, 10), randint(0, 6)
+    x, y = randint(0, 9), randint(0, 6)
     while flag:
         flag = False
-        x, y = randint(0, 10), randint(0, 6)
+        x, y = randint(0, 9), randint(0, 6)
         for (k, user) in name_ws_dict.items():
             if x == user.p_x and y == user.p_y:
                 flag = True
