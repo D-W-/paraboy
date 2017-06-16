@@ -37,6 +37,9 @@ public:
 private:
 	Sprite* gameBackground;
 	MenuItemImage* me;
+	MenuItemImage* buttonIdentify;
+	MenuItemImage* buttonCompare;
+	MenuItemImage* buttonOpenBox;
 	Vector<Sprite*> others;
 	void jsonTest();
 	cocos2d::network::WebSocket* _wsiClient;

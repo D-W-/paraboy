@@ -2,7 +2,7 @@
 
 USING_NS_CC;
 
-GameLayer::GameLayer()
+GameLayer::GameLayer(): buttonCompare(NULL), buttonIdentify(NULL), buttonOpenBox(NULL)
 {
 
 }
@@ -63,10 +63,13 @@ bool GameLayer::init()
 	return true;
 }
 
-
-
 bool GameLayer::onTouchBegan(Touch* touch, Event* unused) 
 {
+	if (buttonIdentify != NULL) {
+		//buttonIdentify->removeAllChildrenWithCleanup(true);
+		buttonIdentify->removeFromParentAndCleanup(true);
+		buttonIdentify = NULL;
+	}
 	auto location = touch->getLocation();
 	me->runAction(MoveTo::create(0.3, location));	
 	sendMessage("Test usage");
@@ -112,7 +115,11 @@ void GameLayer:: jsonTest(){
 
 void GameLayer::createButton(Ref* pSender)
 {
-	CCLOG("click");
+	if (buttonIdentify == NULL) {
+		buttonIdentify = MenuItemImage::create("icon4.jpg", "icon4.jpg", CC_CALLBACK_1(GameLayer::createButton, this));
+		buttonIdentify->setPosition(500, 10);
+		this->addChild(buttonIdentify, 2);
+	}
 }
 
 void GameLayer::sendMessage(String message)
