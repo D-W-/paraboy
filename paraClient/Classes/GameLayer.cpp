@@ -71,7 +71,6 @@ bool GameLayer::onTouchBegan(Touch* touch, Event* unused)
 	me->runAction(MoveTo::create(0.3, location));	
 	sendMessage("Test usage");
 	sendMessage("broadcast:Test usage");
-	jsonTest();
 	return true;
 }
 
@@ -137,7 +136,7 @@ void GameLayer::onOpen(cocos2d::network::WebSocket* ws)
     CCLOG("OnOpen");
 	srand(time(0));
 	std::string name = StringUtils::format("name:wxy%d", rand() % 100);
-	sendMessage(name);
+	sendLogin("wang", 10, 26);
 }
  
 // 接收消息处理函数
@@ -168,4 +167,32 @@ void GameLayer::onError(cocos2d::network::WebSocket* ws, const cocos2d::network:
         sprintf(buf, "an error was fired, code: %d", error);
     }
     CCLOG("Error was fired, error code: %d", error);
+}
+
+// added by wangxiyang
+void GameLayer::sendLogin(String id, int publicKey_d, int publicKey_n){
+	Document doc;
+	Document::AllocatorType& allocator = doc.GetAllocator();
+	doc.SetObject();
+	doc.AddMember("id", JsonValue(StringRef(id.getCString())).Move(), allocator);
+	doc.AddMember("action", JsonValue("login").Move(), allocator);
+	Document msg;
+	msg.SetObject();
+	msg.AddMember("d", JsonValue(publicKey_d).Move(), msg.GetAllocator());
+	msg.AddMember("n", JsonValue(publicKey_n).Move(), msg.GetAllocator());
+	doc.AddMember("msg", msg, allocator);
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	doc.Accept(writer);
+	sendMessage(buffer.GetString());
+}
+void GameLayer::sendMove(int x, int y){
+
+}
+
+void GameLayer::recvCreate(JsonValue msg){
+
+}
+void GameLayer::recvMove(JsonValue msg){
+
 }
