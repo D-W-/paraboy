@@ -26,7 +26,7 @@ public:
 
 	static Scene* createScene();
 	CREATE_FUNC(GameLayer);
-	void createButton(Ref * pSender, string id);
+	void createButton(Ref * pSender);
 	void onIdentify(Ref* pSender);
 	void onCompare(Ref* pSender);
 	void onOpenBox(Ref* pSender);
@@ -43,6 +43,7 @@ public:
 	virtual void onError(cocos2d::network::WebSocket* ws, const cocos2d::network::WebSocket::ErrorCode& error);
 private:
 	Sprite* gameBackground;
+	CCMenu* menu;
 	//point to current user, can get publicKey, privateKey, ID, SSID from here
 	ParaBoy* me;
 	MenuItemImage* buttonIdentify;

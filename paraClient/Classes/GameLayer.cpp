@@ -38,19 +38,21 @@ bool GameLayer::init()
 	gameBackground->setPosition(Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 	this->addChild(gameBackground, 0);
 
+	menu = CCMenu::create(NULL);
+	menu->setPosition(0, 0);
+	this->addChild(menu, 1);
+
+
 	//建立websocket
 	_wsiClient = new cocos2d::network::WebSocket();
 	_wsiClient->init(*this, "ws://166.111.80.54:7000/echo");
 
 	//人物初始化
 
-	//me = ParaBoy::create("icon4.jpg", "icon4.jpg", CC_CALLBACK_1(GameLayer::createButton, this, "sss"));
+	//me = ParaBoy::create("icon4.jpg", "icon4.jpg", CC_CALLBACK_1(GameLayer::createButton, this));
 	//me->setPosition(0, 0);
 	//this->addChild(me, 1);
 
-/*	CCMenu* menu = CCMenu::create(me, NULL);
-	menu->setPosition(0, 0);
-	this->addChild(menu, 1)*/;
 
 	// bind touch event实现触摸效果
 	auto touchListener = EventListenerTouchOneByOne::create();
@@ -68,6 +70,7 @@ bool GameLayer::init()
 
 bool GameLayer::onTouchBegan(Touch* touch, Event* unused) 
 {
+	CCLOG("Click");
 	if (buttonIdentify != NULL) {
 		//buttonIdentify->removeAllChildrenWithCleanup(true);
 		buttonIdentify->removeFromParentAndCleanup(true);
@@ -123,12 +126,13 @@ Vec2 GameLayer::toRealLocation(int x, int y)
 	return Vec2(x*144, y*144);
 }
 
-void GameLayer::createButton(Ref* pSender, string id)
+void GameLayer::createButton(Ref* pSender)
 {
-	CCLOG(id.c_str());
+	//CCLOG(id.c_str());
+	CCLOG("Click");
 	if (buttonIdentify == NULL) {
-		buttonIdentify = MenuItemImage::create("icon4.jpg", "icon4.jpg", CC_CALLBACK_1(GameLayer::onIdentify, this));
-		buttonIdentify->setPosition(500, 10);
+		buttonIdentify = MenuItemImage::create("button0.png", "button0b.png", CC_CALLBACK_1(GameLayer::onIdentify, this));
+		buttonIdentify->setPosition(600, 100);
 		this->addChild(buttonIdentify, 2);
 	}
 }
@@ -343,14 +347,14 @@ void GameLayer::doCreate(string id, int x, int y, string d, string n){
 	stringstream ss;
 	ss << userCount;
 	string userImage = "icon" + ss.str() + ".jpg", backImage = "bicon" + ss.str() + ".jpg";
-	ParaBoy* current = ParaBoy::create(userImage, backImage, CC_CALLBACK_1(GameLayer::createButton, this, id));
+	ParaBoy* current = ParaBoy::create(userImage, backImage, CC_CALLBACK_1(GameLayer::createButton, this));
 	if (id == me->getID()){
 		me = current;
 	}
 	current->setId(id);
 	current->setPublicKey(d, n);
 	current->setPosition(toRealLocation(x, y));
-	this->addChild(current, 1);
+	this->menu->addChild(current, 1);
 
 	idMap[id] = current;
 	userCount++;
