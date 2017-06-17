@@ -2,6 +2,7 @@
 #define __GAMELAYER_H__
 
 #include "cocos2d.h"
+#include "ParaBoy.h"
 #include "network/WebSocket.h"
 #include "json/document.h"
 #include "json/writer.h"
@@ -42,14 +43,15 @@ public:
 	virtual void onError(cocos2d::network::WebSocket* ws, const cocos2d::network::WebSocket::ErrorCode& error);
 private:
 	Sprite* gameBackground;
-	MenuItemImage* me;
+	//point to current user, can get publicKey, privateKey, ID, SSID from here
+	ParaBoy* me;
 	MenuItemImage* buttonIdentify;
 	MenuItemImage* buttonCompare;
 	MenuItemImage* buttonOpenBox;
 	//Vector<MenuItemImage*> others;
 	int userCount;
-	unordered_map<string, MenuItemImage*> idMap;
-	String my_id;   // 用户id，新建伞兵类之后可删去
+	unordered_map<string, ParaBoy*> idMap;
+	//String my_id;   // 用户id，新建伞兵类之后可删去
 	void jsonTest();
 	cocos2d::network::WebSocket* _wsiClient;
 

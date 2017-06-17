@@ -122,8 +122,8 @@ public:
 		return bigNumToStr(this->d);
 	}
 
-	BigNum getE() {
-		return this->e;
+	string getE() {
+		return bigNumToStr(this->e);
 	}
 
 	BigNum getP() {
