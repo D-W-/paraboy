@@ -36,6 +36,10 @@ def echo_socket(ws):
             action_login(sender, msg, ws)
         elif action == 'move':
             action_move(sender, msg, ws)
+        elif action == 'auth':
+            action_auth(sender, msg, ws)
+        elif action == 'auth2':
+            action_auth2(sender, msg, ws)
 
 
 def remove_ws(ws):
@@ -50,10 +54,10 @@ def remove_ws(ws):
 
 def get_init_pos():
     flag = True
-    x, y = randint(0, 10), randint(0, 6)
+    x, y = randint(0, 9), randint(0, 6)
     while flag:
         flag = False
-        x, y = randint(0, 10), randint(0, 6)
+        x, y = randint(0, 9), randint(0, 6)
         for (k, user) in name_ws_dict.items():
             if x == user.p_x and y == user.p_y:
                 flag = True
@@ -78,9 +82,26 @@ def action_move(sender, msg, ws):
     send_broadcast(json.dumps(jd))
 
 
+def action_auth(sender, msg, ws):
+    jd = {'action': 'auth', 'msg': msg}
+    jd['msg']['source'] = sender
+    send_target(json.dumps(jd), msg['target'])
+
+
+def action_auth2(sender, msg, ws):
+    jd = {'action': 'auth2', 'msg': msg}
+    jd['msg']['source'] = sender
+    send_target(json.dumps(jd), msg['target'])
+
+
 def send_broadcast(msg):
     for (name, user) in name_ws_dict.items():
         user.ws.send(msg)
+
+
+def send_target(msg, target):
+    if target in name_ws_dict.keys():
+        name_ws_dict[target].ws.send(msg)
 
 
 @app.route('/')

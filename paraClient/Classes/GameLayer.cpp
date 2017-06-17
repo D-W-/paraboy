@@ -38,14 +38,19 @@ bool GameLayer::init()
 	gameBackground->setPosition(Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 	this->addChild(gameBackground, 0);
 
+	//建立websocket
+	_wsiClient = new cocos2d::network::WebSocket();
+	_wsiClient->init(*this, "ws://166.111.80.54:7000/echo");
+
 	//人物初始化
-	me = MenuItemImage::create("icon4.jpg", "icon4.jpg", CC_CALLBACK_1(GameLayer::createButton, this, "sss"));
-	me->setPosition(0, 0);
+
+	//me = MenuItemImage::create("icon4.jpg", "icon4.jpg", CC_CALLBACK_1(GameLayer::createButton, this, "sss"));
+	//me->setPosition(0, 0);
 	//this->addChild(me, 1);
 
-	CCMenu* menu = CCMenu::create(me, NULL);
+/*	CCMenu* menu = CCMenu::create(me, NULL);
 	menu->setPosition(0, 0);
-	this->addChild(menu, 1);
+	this->addChild(menu, 1)*/;
 
 	// bind touch event实现触摸效果
 	auto touchListener = EventListenerTouchOneByOne::create();
@@ -57,9 +62,7 @@ bool GameLayer::init()
 	keyListener->onKeyReleased = CC_CALLBACK_2(GameLayer::onKeyReleased, this);
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(keyListener, this);
 	
-	//建立websocket
-	_wsiClient = new cocos2d::network::WebSocket();
-	_wsiClient->init(*this, "ws://166.111.80.54:7000/echo");
+
 	return true;
 }
 
@@ -70,10 +73,9 @@ bool GameLayer::onTouchBegan(Touch* touch, Event* unused)
 		buttonIdentify->removeFromParentAndCleanup(true);
 		buttonIdentify = NULL;
 	}
-	auto location = touch->getLocation();
-	me->runAction(MoveTo::create(0.3, location));	
-	sendMessage("Test usage");
-	sendMessage("broadcast:Test usage");
+	//auto location = touch->getLocation();
+	//me->runAction(MoveTo::create(0.3, location));	
+	//sendMove(location.x,location.y);
 	return true;
 }
 
@@ -93,8 +95,10 @@ void GameLayer::onKeyReleased(EventKeyboard::KeyCode keycode, Event * event)
 		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
 			offsetY = -144;
 	}
-	auto moveTo = MoveTo::create(0.3, Vec2(me->getPositionX() + offsetX, me->getPositionY() + offsetY));
-	me->runAction(moveTo);
+	//auto moveTo = MoveTo::create(0.3, Vec2(me->getPositionX() + offsetX, me->getPositionY() + offsetY));
+	//me->runAction(moveTo);
+	MenuItemImage* current = idMap[my_id._string];
+	sendMove(current->getPositionX() + offsetX, current->getPositionY() + offsetY);
 }
 
 void GameLayer:: jsonTest(){
@@ -111,28 +115,6 @@ void GameLayer:: jsonTest(){
 	Writer<StringBuffer> writer(buffer);
 	doc.Accept(writer);
 	sendMessage(buffer.GetString());
-}
-
-void GameLayer::createUser(string id, int x, int y)
-{
-	stringstream ss;
-	ss << userCount;
-	string userImage = "icon" + ss.str() + ".jpg", backImage = "bicon" + ss.str() + ".jpg";
-	MenuItemImage* current = MenuItemImage::create(userImage, backImage, CC_CALLBACK_1(GameLayer::createButton, this, id));
-	current->setPosition(x, y);
-	this->addChild(current, 1);
-
-	idMap[id] = current;
-	userCount++;
-}
-
-void GameLayer::removeUser(string id)
-{
-}
-
-void GameLayer::moveUser(string id, int x, int y)
-{
-
 }
 
 void GameLayer::createButton(Ref* pSender, string id)
@@ -180,15 +162,34 @@ void GameLayer::onOpen(cocos2d::network::WebSocket* ws)
 {
     CCLOG("OnOpen");
 	srand(time(0));
-	std::string name = StringUtils::format("name:wxy%d", rand() % 100);
-	sendLogin("wang", 10, 26);
+	std::string name = StringUtils::format("wxy%d", rand() % 100);
+	my_id = name;
+	sendLogin(name, 9, 6);
+	//sendMove(5, 5);
+	//sendAuth(name, "asjdhgfalkdjshfgaskdhfakldsfhakdfhlaldshf");
+	//sendAuth2(name, "kljhlkhasdkflhasdjhflkjsflkdhsfagsdsfhlja");
 }
  
 // 接收消息处理函数
 void GameLayer::onMessage(cocos2d::network::WebSocket* ws, const cocos2d::network::WebSocket::Data& data)
 {
         std::string textStr = data.bytes;
-        textStr.c_str();
+		Document doc;
+		doc.Parse(textStr.c_str());
+		const char *action = doc["action"].GetString();
+		if (strcmp(action,"create") == 0){
+			recvCreate(doc["msg"].GetObjectW());
+		}
+		else if (strcmp(action, "move") == 0){
+			recvMove(doc["msg"].GetObjectW());
+		}
+		else if (strcmp(action, "auth") == 0){
+			recvAuth(doc["msg"].GetObjectW());
+		}
+		else if (strcmp(action, "auth2") == 0){
+			recvAuth2(doc["msg"].GetObjectW());
+		}
+		CCLOG(action);
         CCLOG(textStr.c_str());
 }
  
@@ -232,12 +233,113 @@ void GameLayer::sendLogin(String id, int publicKey_d, int publicKey_n){
 	sendMessage(buffer.GetString());
 }
 void GameLayer::sendMove(int x, int y){
-
+	Document doc;
+	Document::AllocatorType& allocator = doc.GetAllocator();
+	doc.SetObject();
+	doc.AddMember("id", JsonValue(StringRef(my_id.getCString())).Move(), allocator);
+	doc.AddMember("action", JsonValue("move").Move(), allocator);
+	Document msg;
+	msg.SetObject();
+	msg.AddMember("x", JsonValue(x).Move(), msg.GetAllocator());
+	msg.AddMember("y", JsonValue(y).Move(), msg.GetAllocator());
+	doc.AddMember("msg", msg, allocator);
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	doc.Accept(writer);
+	sendMessage(buffer.GetString());
+}
+void GameLayer::sendAuth(String targetId, String authMsg){
+	Document doc;
+	Document::AllocatorType& allocator = doc.GetAllocator();
+	doc.SetObject();
+	doc.AddMember("id", JsonValue(StringRef(my_id.getCString())).Move(), allocator);
+	doc.AddMember("action", JsonValue("auth").Move(), allocator);
+	Document msg;
+	msg.SetObject();
+	msg.AddMember("target", JsonValue(StringRef(targetId.getCString())).Move(), msg.GetAllocator());
+	msg.AddMember("authMsg", JsonValue(StringRef(authMsg.getCString())).Move(), msg.GetAllocator());
+	doc.AddMember("msg", msg, allocator);
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	doc.Accept(writer);
+	sendMessage(buffer.GetString());
+}
+void GameLayer::sendAuth2(String targetId, String auth2Msg){
+	Document doc;
+	Document::AllocatorType& allocator = doc.GetAllocator();
+	doc.SetObject();
+	doc.AddMember("id", JsonValue(StringRef(my_id.getCString())).Move(), allocator);
+	doc.AddMember("action", JsonValue("auth2").Move(), allocator);
+	Document msg;
+	msg.SetObject();
+	msg.AddMember("target", JsonValue(StringRef(targetId.getCString())).Move(), msg.GetAllocator());
+	msg.AddMember("auth2Msg", JsonValue(StringRef(auth2Msg.getCString())).Move(), msg.GetAllocator());
+	doc.AddMember("msg", msg, allocator);
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	doc.Accept(writer);
+	sendMessage(buffer.GetString());
 }
 
 void GameLayer::recvCreate(JsonValue msg){
-
+	string c_id = msg["id"].GetString();
+	int x = msg["x"].GetInt();
+	int y = msg["y"].GetInt();
+	int d = msg["d"].GetInt();
+	int n = msg["n"].GetInt();
+	doCreate(c_id, x, y, d, n);
+	//CCLOG(c_id.getCString());
 }
 void GameLayer::recvMove(JsonValue msg){
+	string c_id = msg["id"].GetString();
+	int x = msg["x"].GetInt();
+	int y = msg["y"].GetInt();
+	doMove(c_id, x, y);
+	//CCLOG(c_id.getCString());
+}
 
+void GameLayer::recvAuth(JsonValue msg){
+	string sourceId = msg["source"].GetString();
+	string authMsg = msg["authMsg"].GetString();
+	doAuth(sourceId, authMsg);
+}
+
+void GameLayer::recvAuth2(JsonValue msg){
+	string sourceId = msg["source"].GetString();
+	string auth2Msg = msg["auth2Msg"].GetString();
+	doAuth2(sourceId, auth2Msg);
+}
+
+void GameLayer::doCreate(string id, int x, int y, int d, int n){
+	CCLOG("doCreate:%s,%d,%d,%d,%d", id, x, y, d, n);
+	stringstream ss;
+	ss << userCount;
+	string userImage = "icon" + ss.str() + ".jpg", backImage = "bicon" + ss.str() + ".jpg";
+	MenuItemImage* current = MenuItemImage::create(userImage, backImage, CC_CALLBACK_1(GameLayer::createButton, this, id));
+	current->setPosition(x, y);
+	this->addChild(current, 1);
+
+	idMap[id] = current;
+	userCount++;
+}
+
+void GameLayer::doMove(string id, int x, int y){
+	CCLOG("doMove:%s,%d,%d", id, x, y);
+	MenuItemImage* current = idMap[id];
+	current->runAction(MoveTo::create(0.3, Vec2(x, y)));
+}
+
+void GameLayer::doAuth(string sourceId, string authMsg){
+	//need wanghan to finish...
+	CCLOG("doAuth:%s,%s", sourceId, authMsg);
+}
+
+void GameLayer::doAuth2(string sourceId, string auth2Msg){
+	//need wanghan to finish...
+	CCLOG("doAuth:%s,%s", sourceId, auth2Msg);
+}
+
+void GameLayer::doRemove(string id)
+{
+	
 }

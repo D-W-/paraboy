@@ -49,23 +49,30 @@ private:
 	//Vector<MenuItemImage*> others;
 	int userCount;
 	unordered_map<string, MenuItemImage*> idMap;
+	String my_id;   // 用户id，新建伞兵类之后可删去
 	void jsonTest();
 	cocos2d::network::WebSocket* _wsiClient;
-
-	void createUser(string id, int x, int y);
-	void removeUser(string id);
-	void moveUser(string id, int x, int y);
 
 
 // added by wangxiyang
 public:
-// send actions
+	// send actions
 	void sendLogin(String id, int publicKey_d, int publicKey_n);
 	void sendMove(int x, int y);
+	void sendAuth(String targetId, String authMsg);
+	void sendAuth2(String targetId, String auth2Msg);
 
-// receive actions
+	// receive actions
 	void recvCreate(JsonValue msg);
 	void recvMove(JsonValue msg);
-	
+	void recvAuth(JsonValue msg);
+	void recvAuth2(JsonValue msg);
+
+	// response actions
+	void doCreate(string id, int px, int py, int publicKey_d,int publicKey_n);
+	void doMove(string id, int px, int py);
+	void doAuth(string sourceId, string authMsg);
+	void doAuth2(string sourceId, string auth2Msg);
+	void doRemove(string id);
 };
 #endif /* defined(__GAMELAYER_H__) */
