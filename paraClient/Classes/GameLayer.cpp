@@ -145,6 +145,8 @@ void GameLayer::onOpen(cocos2d::network::WebSocket* ws)
 	my_id = name;
 	sendLogin(name, 9, 6);
 	sendMove(5, 5);
+	sendAuth(name, "asjdhgfalkdjshfgaskdhfakldsfhakdfhlaldshf");
+	sendAuth2(name, "kljhlkhasdkflhasdjhflkjsflkdhsfagsdsfhlja");
 }
  
 // 接收消息处理函数
@@ -159,6 +161,12 @@ void GameLayer::onMessage(cocos2d::network::WebSocket* ws, const cocos2d::networ
 		}
 		else if (strcmp(action, "move") == 0){
 			recvMove(doc["msg"].GetObjectW());
+		}
+		else if (strcmp(action, "auth") == 0){
+			recvAuth(doc["msg"].GetObjectW());
+		}
+		else if (strcmp(action, "auth2") == 0){
+			recvAuth2(doc["msg"].GetObjectW());
 		}
 		CCLOG(action);
         CCLOG(textStr.c_str());
@@ -219,6 +227,38 @@ void GameLayer::sendMove(int x, int y){
 	doc.Accept(writer);
 	sendMessage(buffer.GetString());
 }
+void GameLayer::sendAuth(String targetId, String authMsg){
+	Document doc;
+	Document::AllocatorType& allocator = doc.GetAllocator();
+	doc.SetObject();
+	doc.AddMember("id", JsonValue(StringRef(my_id.getCString())).Move(), allocator);
+	doc.AddMember("action", JsonValue("auth").Move(), allocator);
+	Document msg;
+	msg.SetObject();
+	msg.AddMember("target", JsonValue(StringRef(targetId.getCString())).Move(), msg.GetAllocator());
+	msg.AddMember("authMsg", JsonValue(StringRef(authMsg.getCString())).Move(), msg.GetAllocator());
+	doc.AddMember("msg", msg, allocator);
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	doc.Accept(writer);
+	sendMessage(buffer.GetString());
+}
+void GameLayer::sendAuth2(String targetId, String auth2Msg){
+	Document doc;
+	Document::AllocatorType& allocator = doc.GetAllocator();
+	doc.SetObject();
+	doc.AddMember("id", JsonValue(StringRef(my_id.getCString())).Move(), allocator);
+	doc.AddMember("action", JsonValue("auth2").Move(), allocator);
+	Document msg;
+	msg.SetObject();
+	msg.AddMember("target", JsonValue(StringRef(targetId.getCString())).Move(), msg.GetAllocator());
+	msg.AddMember("auth2Msg", JsonValue(StringRef(auth2Msg.getCString())).Move(), msg.GetAllocator());
+	doc.AddMember("msg", msg, allocator);
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	doc.Accept(writer);
+	sendMessage(buffer.GetString());
+}
 
 void GameLayer::recvCreate(JsonValue msg){
 	String c_id = msg["id"].GetString();
@@ -237,6 +277,18 @@ void GameLayer::recvMove(JsonValue msg){
 	//CCLOG(c_id.getCString());
 }
 
+void GameLayer::recvAuth(JsonValue msg){
+	String sourceId = msg["source"].GetString();
+	String authMsg = msg["authMsg"].GetString();
+	doAuth(sourceId, authMsg);
+}
+
+void GameLayer::recvAuth2(JsonValue msg){
+	String sourceId = msg["source"].GetString();
+	String auth2Msg = msg["auth2Msg"].GetString();
+	doAuth2(sourceId, auth2Msg);
+}
+
 void GameLayer::doCreate(String id, int x, int y, int d, int n){
 	//need wanghan to finish...
 	CCLOG("doCreate:%s,%d,%d,%d,%d", id.getCString(), x, y, d, n);
@@ -245,4 +297,13 @@ void GameLayer::doCreate(String id, int x, int y, int d, int n){
 void GameLayer::doMove(String id, int x, int y){
 	//need wanghan to finish...
 	CCLOG("doMove:%s,%d,%d", id.getCString(), x, y);
+}
+
+void GameLayer::doAuth(String sourceId, String authMsg){
+	//need wanghan to finish...
+	CCLOG("doAuth:%s,%s", sourceId.getCString(), authMsg.getCString());
+}
+void GameLayer::doAuth2(String sourceId, String auth2Msg){
+	//need wanghan to finish...
+	CCLOG("doAuth:%s,%s", sourceId.getCString(), auth2Msg.getCString());
 }

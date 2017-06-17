@@ -41,21 +41,28 @@ private:
 	MenuItemImage* buttonCompare;
 	MenuItemImage* buttonOpenBox;
 	Vector<Sprite*> others;
-	String my_id;
+	String my_id;   // 用户id，新建伞兵类之后可删去
 	void jsonTest();
 	cocos2d::network::WebSocket* _wsiClient;
 
 // added by wangxiyang
 public:
-// send actions
+	// send actions
 	void sendLogin(String id, int publicKey_d, int publicKey_n);
 	void sendMove(int x, int y);
+	void sendAuth(String targetId, String authMsg);
+	void sendAuth2(String targetId, String auth2Msg);
 
-// receive actions
+	// receive actions
 	void recvCreate(JsonValue msg);
 	void recvMove(JsonValue msg);
-	
+	void recvAuth(JsonValue msg);
+	void recvAuth2(JsonValue msg);
+
+	// response actions
 	void doCreate(String id, int px, int py, int publicKey_d,int publicKey_n);
 	void doMove(String id, int px, int py);
+	void doAuth(String sourceId, String authMsg);
+	void doAuth2(String sourceId, String auth2Msg);
 };
 #endif /* defined(__GAMELAYER_H__) */

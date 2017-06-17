@@ -85,13 +85,13 @@ def action_move(sender, msg, ws):
 def action_auth(sender, msg, ws):
     jd = {'action': 'auth', 'msg': msg}
     jd['msg']['source'] = sender
-    sender_target(json.dumps(jd), msg['target'])
+    send_target(json.dumps(jd), msg['target'])
 
 
 def action_auth2(sender, msg, ws):
     jd = {'action': 'auth2', 'msg': msg}
     jd['msg']['source'] = sender
-    sender_target(json.dumps(jd), msg['target'])
+    send_target(json.dumps(jd), msg['target'])
 
 
 def send_broadcast(msg):
