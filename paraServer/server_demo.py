@@ -28,7 +28,12 @@ def echo_socket(ws):
             remove_ws(ws)
             continue
         print("message:", message)
-        parsed_msg = json.loads(message)
+        try:
+            parsed_msg = json.loads(message)
+        except ValueError:
+            print("this message is not a json string, skipped!")
+            continue
+
         sender = parsed_msg['id']
         action = parsed_msg['action']
         msg = parsed_msg['msg']
