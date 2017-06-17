@@ -94,7 +94,7 @@ def action_login(sender, msg, ws):
 
     tmp_jd = {'action': 'login2', 'msg': {}}
     tmp_jd["msg"]["users"] = user_list
-    send_target(sender, json.dumps(tmp_jd))
+    ws.send(json.dumps(tmp_jd))
 
     x, y = get_init_pos()
     bx, by = get_box_secret()
@@ -112,6 +112,7 @@ def action_move(sender, msg, ws):
     jd = {'action': 'move', 'msg': {}}
     jd['msg']['id'] = sender
     jd['msg']['x'], jd['msg']['y'] = msg['x'], msg['y']
+    name_ws_dict[sender].p_x,name_ws_dict[sender].p_y = msg['x'], msg['y']
     send_broadcast(json.dumps(jd))
 
 

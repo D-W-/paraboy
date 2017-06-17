@@ -170,10 +170,11 @@ void GameLayer::onOpen(cocos2d::network::WebSocket* ws)
 	srand(time(0));
 	std::string name = StringUtils::format("wxy%d", rand() % 100);
 	me = new ParaBoy();
+	me->setId(name);
 	me->initRSA();
 	string d, n;
 	me->getPublicKey(d, n);
-	sendLogin(name, 9, 6);
+	sendLogin(name, d, n);
 	//sendMove(5, 5);
 	//sendAuth(name, "asjdhgfalkdjshfgaskdhfakldsfhakdfhlaldshf");
 	//sendAuth2(name, "kljhlkhasdkflhasdjhflkjsflkdhsfagsdsfhlja");
@@ -197,6 +198,9 @@ void GameLayer::onMessage(cocos2d::network::WebSocket* ws, const cocos2d::networ
 		}
 		else if (strcmp(action, "auth2") == 0){
 			recvAuth2(doc["msg"].GetObjectW());
+		}
+		else if (strcmp(action, "login2") == 0){
+			recvLogin2(doc["msg"].GetObjectW());
 		}
 		CCLOG(action);
         CCLOG(textStr.c_str());
@@ -225,7 +229,7 @@ void GameLayer::onError(cocos2d::network::WebSocket* ws, const cocos2d::network:
 }
 
 // added by wangxiyang
-void GameLayer::sendLogin(String id, int publicKey_d, int publicKey_n){
+void GameLayer::sendLogin(String id, String publicKey_d, String publicKey_n){
 	Document doc;
 	Document::AllocatorType& allocator = doc.GetAllocator();
 	doc.SetObject();
@@ -233,8 +237,8 @@ void GameLayer::sendLogin(String id, int publicKey_d, int publicKey_n){
 	doc.AddMember("action", JsonValue("login").Move(), allocator);
 	Document msg;
 	msg.SetObject();
-	msg.AddMember("d", JsonValue(publicKey_d).Move(), msg.GetAllocator());
-	msg.AddMember("n", JsonValue(publicKey_n).Move(), msg.GetAllocator());
+	msg.AddMember("d", JsonValue(StringRef(publicKey_d.getCString())).Move(), msg.GetAllocator());
+	msg.AddMember("n", JsonValue(StringRef(publicKey_n.getCString())).Move(), msg.GetAllocator());
 	doc.AddMember("msg", msg, allocator);
 	StringBuffer buffer;
 	Writer<StringBuffer> writer(buffer);
@@ -293,12 +297,20 @@ void GameLayer::sendAuth2(String targetId, String auth2Msg){
 	sendMessage(buffer.GetString());
 }
 
+void GameLayer::recvLogin2(JsonValue msg){
+	JsonValue users = msg["users"].GetArray();
+	userCount = 0;
+	for (SizeType i = 0; i < users.Size(); i++){
+		doCreate(users[i]["id"].GetString(), users[i]["x"].GetInt(), users[i]["y"].GetInt(), users[i]["d"].GetString(), users[i]["n"].GetString());
+	}
+}
+
 void GameLayer::recvCreate(JsonValue msg){
 	string c_id = msg["id"].GetString();
 	int x = msg["x"].GetInt();
 	int y = msg["y"].GetInt();
-	int d = msg["d"].GetInt();
-	int n = msg["n"].GetInt();
+	string d = msg["d"].GetString();
+	string n = msg["n"].GetString();
 	doCreate(c_id, x, y, d, n);
 	//CCLOG(c_id.getCString());
 }
@@ -322,16 +334,22 @@ void GameLayer::recvAuth2(JsonValue msg){
 	doAuth2(sourceId, auth2Msg);
 }
 
-void GameLayer::doCreate(string id, int x, int y, int d, int n){
-	CCLOG("doCreate:%s,%d,%d,%d,%d", id, x, y, d, n);
+void GameLayer::doLogin2(){
+
+}
+
+void GameLayer::doCreate(string id, int x, int y, string d, string n){
+	CCLOG("doCreate:%s,%d,%d,%s,%s", id.c_str(), x, y, d.c_str(), n.c_str());
 	stringstream ss;
 	ss << userCount;
 	string userImage = "icon" + ss.str() + ".jpg", backImage = "bicon" + ss.str() + ".jpg";
 	ParaBoy* current = ParaBoy::create(userImage, backImage, CC_CALLBACK_1(GameLayer::createButton, this, id));
-	me = current;
+	if (id == me->getID()){
+		me = current;
+	}
 	current->setId(id);
-	//current->setPublicKey(d, n);
-	current->setPosition(x, y);
+	current->setPublicKey(d, n);
+	current->setPosition(toRealLocation(x, y));
 	this->addChild(current, 1);
 
 	idMap[id] = current;

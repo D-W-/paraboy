@@ -59,19 +59,21 @@ private:
 // added by wangxiyang
 public:
 	// send actions
-	void sendLogin(String id, int publicKey_d, int publicKey_n);
+	void sendLogin(String id, String publicKey_d, String publicKey_n);
 	void sendMove(int x, int y);
 	void sendAuth(String targetId, String authMsg);
 	void sendAuth2(String targetId, String auth2Msg);
 
 	// receive actions
+	void recvLogin2(JsonValue msg);
 	void recvCreate(JsonValue msg);
 	void recvMove(JsonValue msg);
 	void recvAuth(JsonValue msg);
 	void recvAuth2(JsonValue msg);
 
 	// response actions
-	void doCreate(string id, int px, int py, int publicKey_d,int publicKey_n);
+	void doLogin2();
+	void doCreate(string id, int px, int py, string publicKey_d,string publicKey_n);
 	void doMove(string id, int px, int py);
 	void doAuth(string sourceId, string authMsg);
 	void doAuth2(string sourceId, string auth2Msg);
