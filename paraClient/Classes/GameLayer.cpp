@@ -70,11 +70,18 @@ bool GameLayer::init()
 
 bool GameLayer::onTouchBegan(Touch* touch, Event* unused) 
 {
-	CCLOG("Click");
+	//CCLOG("Click");
 	if (buttonIdentify != NULL) {
-		//buttonIdentify->removeAllChildrenWithCleanup(true);
 		buttonIdentify->removeFromParentAndCleanup(true);
 		buttonIdentify = NULL;
+	}
+	if (buttonCompare != NULL) {
+		buttonCompare->removeFromParentAndCleanup(true);
+		buttonCompare = NULL;
+	}
+	if (buttonOpenBox != NULL) {
+		buttonOpenBox->removeFromParentAndCleanup(true);
+		buttonOpenBox = NULL;
 	}
 	//auto location = touch->getLocation();
 	//me->runAction(MoveTo::create(0.3, location));	
@@ -126,28 +133,35 @@ Vec2 GameLayer::toRealLocation(int x, int y)
 	return Vec2(x*144, y*144);
 }
 
-void GameLayer::createButton(Ref* pSender)
+void GameLayer::createButton(Ref* pSender, string id)
 {
-	//CCLOG(id.c_str());
-	CCLOG("Click");
+	if (me->getID() == id)
+		return;
+	string temp = "sender: " + me->getID() + "rev:" + id;
+	CCLOG(temp.c_str());
 	if (buttonIdentify == NULL) {
-		buttonIdentify = MenuItemImage::create("button0.png", "button0b.png", CC_CALLBACK_1(GameLayer::onIdentify, this));
+		buttonIdentify = MenuItemImage::create("button0.png", "button0b.png", CC_CALLBACK_1(GameLayer::onIdentify, this, me->getID(), id));
 		buttonIdentify->setPosition(600, 100);
-		this->addChild(buttonIdentify, 2);
+		menu->addChild(buttonIdentify, 2);
+	}
+	if (buttonCompare == NULL) {
+		buttonCompare = MenuItemImage::create("button0.png", "button0b.png", CC_CALLBACK_1(GameLayer::onCompare, this, me->getID(), id));
+		buttonCompare->setPosition(600, 150);
+		menu->addChild(buttonCompare, 2);
 	}
 }
 
-void GameLayer::onIdentify(Ref * pSender)
+void GameLayer::onIdentify(Ref * pSender, string sender, string receiver)
 {
 	CCLOG("Clikcked");
 }
 
-void GameLayer::onCompare(Ref * pSender)
+void GameLayer::onCompare(Ref * pSender, string sender, string receiver)
 {
 	CCLOG("Clikcked");
 }
 
-void GameLayer::onOpenBox(Ref * pSender)
+void GameLayer::onOpenBox(Ref * pSender, string id)
 {
 	CCLOG("CLicked");
 }
@@ -347,7 +361,7 @@ void GameLayer::doCreate(string id, int x, int y, string d, string n){
 	stringstream ss;
 	ss << userCount;
 	string userImage = "icon" + ss.str() + ".jpg", backImage = "bicon" + ss.str() + ".jpg";
-	ParaBoy* current = ParaBoy::create(userImage, backImage, CC_CALLBACK_1(GameLayer::createButton, this));
+	ParaBoy* current = ParaBoy::create(userImage, backImage, CC_CALLBACK_1(GameLayer::createButton, this, id));
 	if (id == me->getID()){
 		me = current;
 	}

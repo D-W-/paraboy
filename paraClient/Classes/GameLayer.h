@@ -26,10 +26,10 @@ public:
 
 	static Scene* createScene();
 	CREATE_FUNC(GameLayer);
-	void createButton(Ref * pSender);
-	void onIdentify(Ref* pSender);
-	void onCompare(Ref* pSender);
-	void onOpenBox(Ref* pSender);
+	void createButton(Ref * pSender, string id);
+	void onIdentify(Ref* pSender, string sender, string receiver);
+	void onCompare(Ref* pSender, string sender, string receiver);
+	void onOpenBox(Ref* pSender, string id);
 
 	void sendMessage(String message);
 	void closeSocket();
