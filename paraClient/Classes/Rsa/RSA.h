@@ -93,7 +93,7 @@ public:
 	string bigNumToStr(BigNum& bignum) {
 		std::ostringstream oss;
 		oss << bignum << endl;
-		return oss.str();
+		return oss.str().substr(0, oss.str().length()-1);
 	}
 
 	void generateKeys() {

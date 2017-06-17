@@ -374,5 +374,6 @@ void GameLayer::doAuth2(string sourceId, string auth2Msg){
 
 void GameLayer::doRemove(string id)
 {
-	
+	ParaBoy* toRemove = idMap[id];
+	toRemove->removeFromParentAndCleanup(true);
 }
