@@ -2,7 +2,7 @@
 
 USING_NS_CC;
 
-GameLayer::GameLayer(): buttonCompare(NULL), buttonIdentify(NULL), buttonOpenBox(NULL)
+GameLayer::GameLayer(): buttonCompare(NULL), buttonIdentify(NULL), buttonOpenBox(NULL), userCount(0)
 {
 
 }
@@ -39,7 +39,7 @@ bool GameLayer::init()
 	this->addChild(gameBackground, 0);
 
 	//人物初始化
-	me = MenuItemImage::create("icon4.jpg", "icon4.jpg", CC_CALLBACK_1(GameLayer::createButton, this));
+	me = MenuItemImage::create("icon4.jpg", "icon4.jpg", CC_CALLBACK_1(GameLayer::createButton, this, "sss"));
 	me->setPosition(0, 0);
 	//this->addChild(me, 1);
 
@@ -113,13 +113,51 @@ void GameLayer:: jsonTest(){
 	sendMessage(buffer.GetString());
 }
 
-void GameLayer::createButton(Ref* pSender)
+void GameLayer::createUser(string id, int x, int y)
 {
+	stringstream ss;
+	ss << userCount;
+	string userImage = "icon" + ss.str() + ".jpg", backImage = "bicon" + ss.str() + ".jpg";
+	MenuItemImage* current = MenuItemImage::create(userImage, backImage, CC_CALLBACK_1(GameLayer::createButton, this, id));
+	current->setPosition(x, y);
+	this->addChild(current, 1);
+
+	idMap[id] = current;
+	userCount++;
+}
+
+void GameLayer::removeUser(string id)
+{
+}
+
+void GameLayer::moveUser(string id, int x, int y)
+{
+
+}
+
+void GameLayer::createButton(Ref* pSender, string id)
+{
+	CCLOG(id.c_str());
 	if (buttonIdentify == NULL) {
-		buttonIdentify = MenuItemImage::create("icon4.jpg", "icon4.jpg", CC_CALLBACK_1(GameLayer::createButton, this));
+		buttonIdentify = MenuItemImage::create("icon4.jpg", "icon4.jpg", CC_CALLBACK_1(GameLayer::onIdentify, this));
 		buttonIdentify->setPosition(500, 10);
 		this->addChild(buttonIdentify, 2);
 	}
+}
+
+void GameLayer::onIdentify(Ref * pSender)
+{
+	CCLOG("Clikcked");
+}
+
+void GameLayer::onCompare(Ref * pSender)
+{
+	CCLOG("Clikcked");
+}
+
+void GameLayer::onOpenBox(Ref * pSender)
+{
+	CCLOG("CLicked");
 }
 
 void GameLayer::sendMessage(String message)
