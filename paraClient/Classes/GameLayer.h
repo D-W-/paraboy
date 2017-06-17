@@ -48,12 +48,12 @@ private:
 	MenuItemImage* buttonIdentify;
 	MenuItemImage* buttonCompare;
 	MenuItemImage* buttonOpenBox;
-	//Vector<MenuItemImage*> others;
 	int userCount;
 	unordered_map<string, ParaBoy*> idMap;
-	//String my_id;   // 用户id，新建伞兵类之后可删去
 	void jsonTest();
 	cocos2d::network::WebSocket* _wsiClient;
+
+	Vec2 toRealLocation(int x, int y);
 
 
 // added by wangxiyang

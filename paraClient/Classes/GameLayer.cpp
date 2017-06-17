@@ -84,21 +84,22 @@ void GameLayer::onKeyReleased(EventKeyboard::KeyCode keycode, Event * event)
 	int offsetX = 0, offsetY = 0;
 	switch (keycode) {
 		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-			offsetX = -144;
+			offsetX = -1;
 			break;
 		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-			offsetX = 144;
+			offsetX = 1;
 			break;
 		case EventKeyboard::KeyCode::KEY_UP_ARROW:
-			offsetY = 144;
+			offsetY = 1;
 			break;
 		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-			offsetY = -144;
+			offsetY = -1;
 	}
 	//auto moveTo = MoveTo::create(0.3, Vec2(me->getPositionX() + offsetX, me->getPositionY() + offsetY));
 	//me->runAction(moveTo);
 	MenuItemImage* current = idMap[me->getID()];
-	sendMove(current->getPositionX() + offsetX, current->getPositionY() + offsetY);
+	int x = current->getPositionX() / 144 + offsetX, y = current->getPositionY() / 144 + offsetY;
+	sendMove(x, y);
 }
 
 void GameLayer:: jsonTest(){
@@ -115,6 +116,11 @@ void GameLayer:: jsonTest(){
 	Writer<StringBuffer> writer(buffer);
 	doc.Accept(writer);
 	sendMessage(buffer.GetString());
+}
+
+Vec2 GameLayer::toRealLocation(int x, int y)
+{
+	return Vec2(x*144, y*144);
 }
 
 void GameLayer::createButton(Ref* pSender, string id)
@@ -335,7 +341,7 @@ void GameLayer::doCreate(string id, int x, int y, int d, int n){
 void GameLayer::doMove(string id, int x, int y){
 	CCLOG("doMove:%s,%d,%d", id, x, y);
 	MenuItemImage* current = idMap[id];
-	current->runAction(MoveTo::create(0.3, Vec2(x, y)));
+	current->runAction(MoveTo::create(0.3, toRealLocation(x, y)));
 }
 
 void GameLayer::doAuth(string sourceId, string authMsg){
