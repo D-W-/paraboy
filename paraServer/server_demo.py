@@ -8,16 +8,19 @@ from random import randint
 app = Flask(__name__)
 sockets = Sockets(app)
 name_ws_dict = {}
+name_list = []
 
 
 class User:
-    def __init__(self, id, ws, pub_d, pub_n, p_x, p_y):
+    def __init__(self, id, ws, pub_d, pub_n, p_x, p_y, b_x, b_y):
         self.ws = ws
         self.id = id
         self.pub_d = pub_d
         self.pub_n = pub_n
         self.p_x = p_x
         self.p_y = p_y
+        self.b_x = b_x
+        self.b_y = b_y
 
 
 @sockets.route('/echo')
@@ -55,6 +58,7 @@ def remove_ws(ws):
             key_to_remove = k
     if key_to_remove is not None:
         del name_ws_dict[key_to_remove]
+        name_list.remove(key_to_remove)
 
 
 def get_init_pos():
@@ -70,13 +74,37 @@ def get_init_pos():
     return x, y
 
 
+def get_box_secret():
+    return 1, 1  # add code later...
+
+
 def action_login(sender, msg, ws):
+    user_list = []
+    for name in name_list:
+        t = name_ws_dict[name]
+        user_dic = {"id": t.id, "x": t.p_x, "y": t.p_y, "d": t.pub_d, "n": t.pub_n, "bx": t.b_x, "by": t.b_y}
+        # user_dic['id'] = name_ws_dict[name].id
+        # user_dic['p_x'] = name_ws_dict[name].p_x
+        # user_dic['p_y'] = name_ws_dict[name].p_y
+        # user_dic['pub_d'] = name_ws_dict[name].pub_d
+        # user_dic['pub_n'] = name_ws_dict[name].pub_n
+        # user_dic['b_x'] = name_ws_dict[name].b_x
+        # user_dic['b_y'] = name_ws_dict[name].b_y
+        user_list.append(user_dic)
+
+    tmp_jd = {'action': 'login2', 'msg': {}}
+    tmp_jd["msg"]["users"] = user_list
+    send_target(sender, json.dumps(tmp_jd))
+
     x, y = get_init_pos()
-    name_ws_dict[sender] = User(sender, ws, msg['d'], msg['n'], x, y)
+    bx, by = get_box_secret()
+    name_list.append(sender)
+    name_ws_dict[sender] = User(sender, ws, msg['d'], msg['n'], x, y, bx, by)
     jd = {'action': 'create', 'msg': {}}
     jd['msg']['id'] = sender
     jd['msg']['x'], jd['msg']['y'] = x, y
     jd['msg']['d'], jd['msg']['n'] = msg['d'], msg['n']
+    jd['msg']['bx'], jd['msg']['by'] = bx, by
     send_broadcast(json.dumps(jd))
 
 
