@@ -44,7 +44,7 @@ bool GameLayer::init()
 
 	//人物初始化
 
-	//me = MenuItemImage::create("icon4.jpg", "icon4.jpg", CC_CALLBACK_1(GameLayer::createButton, this, "sss"));
+	//me = ParaBoy::create("icon4.jpg", "icon4.jpg", CC_CALLBACK_1(GameLayer::createButton, this, "sss"));
 	//me->setPosition(0, 0);
 	//this->addChild(me, 1);
 
@@ -84,21 +84,22 @@ void GameLayer::onKeyReleased(EventKeyboard::KeyCode keycode, Event * event)
 	int offsetX = 0, offsetY = 0;
 	switch (keycode) {
 		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-			offsetX = -144;
+			offsetX = -1;
 			break;
 		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-			offsetX = 144;
+			offsetX = 1;
 			break;
 		case EventKeyboard::KeyCode::KEY_UP_ARROW:
-			offsetY = 144;
+			offsetY = 1;
 			break;
 		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-			offsetY = -144;
+			offsetY = -1;
 	}
 	//auto moveTo = MoveTo::create(0.3, Vec2(me->getPositionX() + offsetX, me->getPositionY() + offsetY));
 	//me->runAction(moveTo);
-	MenuItemImage* current = idMap[my_id._string];
-	sendMove(current->getPositionX() + offsetX, current->getPositionY() + offsetY);
+	MenuItemImage* current = idMap[me->getID()];
+	int x = current->getPositionX() / 144 + offsetX, y = current->getPositionY() / 144 + offsetY;
+	sendMove(x, y);
 }
 
 void GameLayer:: jsonTest(){
@@ -115,6 +116,11 @@ void GameLayer:: jsonTest(){
 	Writer<StringBuffer> writer(buffer);
 	doc.Accept(writer);
 	sendMessage(buffer.GetString());
+}
+
+Vec2 GameLayer::toRealLocation(int x, int y)
+{
+	return Vec2(x*144, y*144);
 }
 
 void GameLayer::createButton(Ref* pSender, string id)
@@ -163,7 +169,10 @@ void GameLayer::onOpen(cocos2d::network::WebSocket* ws)
     CCLOG("OnOpen");
 	srand(time(0));
 	std::string name = StringUtils::format("wxy%d", rand() % 100);
-	my_id = name;
+	me = new ParaBoy();
+	me->initRSA();
+	string d, n;
+	me->getPublicKey(d, n);
 	sendLogin(name, 9, 6);
 	//sendMove(5, 5);
 	//sendAuth(name, "asjdhgfalkdjshfgaskdhfakldsfhakdfhlaldshf");
@@ -236,7 +245,8 @@ void GameLayer::sendMove(int x, int y){
 	Document doc;
 	Document::AllocatorType& allocator = doc.GetAllocator();
 	doc.SetObject();
-	doc.AddMember("id", JsonValue(StringRef(my_id.getCString())).Move(), allocator);
+	string tempStr = me->getID();
+	doc.AddMember("id", JsonValue(StringRef(tempStr.c_str())).Move(), allocator);
 	doc.AddMember("action", JsonValue("move").Move(), allocator);
 	Document msg;
 	msg.SetObject();
@@ -252,7 +262,8 @@ void GameLayer::sendAuth(String targetId, String authMsg){
 	Document doc;
 	Document::AllocatorType& allocator = doc.GetAllocator();
 	doc.SetObject();
-	doc.AddMember("id", JsonValue(StringRef(my_id.getCString())).Move(), allocator);
+	string tempStr = me->getID();
+	doc.AddMember("id", JsonValue(StringRef(tempStr.c_str())).Move(), allocator);;
 	doc.AddMember("action", JsonValue("auth").Move(), allocator);
 	Document msg;
 	msg.SetObject();
@@ -268,7 +279,8 @@ void GameLayer::sendAuth2(String targetId, String auth2Msg){
 	Document doc;
 	Document::AllocatorType& allocator = doc.GetAllocator();
 	doc.SetObject();
-	doc.AddMember("id", JsonValue(StringRef(my_id.getCString())).Move(), allocator);
+	string tempStr = me->getID();
+	doc.AddMember("id", JsonValue(StringRef(tempStr.c_str())).Move(), allocator);
 	doc.AddMember("action", JsonValue("auth2").Move(), allocator);
 	Document msg;
 	msg.SetObject();
@@ -315,7 +327,10 @@ void GameLayer::doCreate(string id, int x, int y, int d, int n){
 	stringstream ss;
 	ss << userCount;
 	string userImage = "icon" + ss.str() + ".jpg", backImage = "bicon" + ss.str() + ".jpg";
-	MenuItemImage* current = MenuItemImage::create(userImage, backImage, CC_CALLBACK_1(GameLayer::createButton, this, id));
+	ParaBoy* current = ParaBoy::create(userImage, backImage, CC_CALLBACK_1(GameLayer::createButton, this, id));
+	me = current;
+	current->setId(id);
+	//current->setPublicKey(d, n);
 	current->setPosition(x, y);
 	this->addChild(current, 1);
 
@@ -326,7 +341,7 @@ void GameLayer::doCreate(string id, int x, int y, int d, int n){
 void GameLayer::doMove(string id, int x, int y){
 	CCLOG("doMove:%s,%d,%d", id, x, y);
 	MenuItemImage* current = idMap[id];
-	current->runAction(MoveTo::create(0.3, Vec2(x, y)));
+	current->runAction(MoveTo::create(0.3, toRealLocation(x, y)));
 }
 
 void GameLayer::doAuth(string sourceId, string authMsg){
