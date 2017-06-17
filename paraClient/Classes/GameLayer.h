@@ -3,12 +3,17 @@
 
 #include "cocos2d.h"
 #include "network/WebSocket.h"
-#include "string"
 #include "json/document.h"
 #include "json/writer.h"
 #include "json/stringbuffer.h"
 
+#include "string"
+#include "unordered_map"
+#include "sstream"
+
 USING_NS_CC;
+
+using namespace std;
 using namespace rapidjson;
 typedef rapidjson::Value JsonValue;
 
@@ -17,10 +22,13 @@ class GameLayer : public Layer, public cocos2d::network::WebSocket::Delegate
 public:
 	GameLayer();
 	~GameLayer();
+
 	static Scene* createScene();
 	CREATE_FUNC(GameLayer);
-
-	void createButton(Ref* pSender);
+	void createButton(Ref * pSender, string id);
+	void onIdentify(Ref* pSender);
+	void onCompare(Ref* pSender);
+	void onOpenBox(Ref* pSender);
 
 	void sendMessage(String message);
 	void closeSocket();
@@ -32,18 +40,19 @@ public:
 	virtual void onMessage(cocos2d::network::WebSocket* ws, const cocos2d::network::WebSocket::Data& data);
 	virtual void onClose(cocos2d::network::WebSocket* ws);
 	virtual void onError(cocos2d::network::WebSocket* ws, const cocos2d::network::WebSocket::ErrorCode& error);
-
-
 private:
 	Sprite* gameBackground;
 	MenuItemImage* me;
 	MenuItemImage* buttonIdentify;
 	MenuItemImage* buttonCompare;
 	MenuItemImage* buttonOpenBox;
-	Vector<Sprite*> others;
+	//Vector<MenuItemImage*> others;
+	int userCount;
+	unordered_map<string, MenuItemImage*> idMap;
 	String my_id;   // 用户id，新建伞兵类之后可删去
 	void jsonTest();
 	cocos2d::network::WebSocket* _wsiClient;
+
 
 // added by wangxiyang
 public:
@@ -60,9 +69,10 @@ public:
 	void recvAuth2(JsonValue msg);
 
 	// response actions
-	void doCreate(String id, int px, int py, int publicKey_d,int publicKey_n);
-	void doMove(String id, int px, int py);
-	void doAuth(String sourceId, String authMsg);
-	void doAuth2(String sourceId, String auth2Msg);
+	void doCreate(string id, int px, int py, int publicKey_d,int publicKey_n);
+	void doMove(string id, int px, int py);
+	void doAuth(string sourceId, string authMsg);
+	void doAuth2(string sourceId, string auth2Msg);
+	void doRemove(string id);
 };
 #endif /* defined(__GAMELAYER_H__) */
