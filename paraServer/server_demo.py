@@ -3,8 +3,7 @@
 from flask import Flask
 from flask_sockets import Sockets
 import json
-from random import randint
-import util
+from random import randint, shuffle
 
 app = Flask(__name__)
 sockets = Sockets(app)
@@ -51,9 +50,28 @@ def echo_socket(ws):
         elif action == 'auth2':
             action_auth2(sender, msg, ws)
         elif action == 'compare':
-            action_compare(sender,msg, ws)
+            action_compare(sender, msg, ws)
         elif action == 'compare2':
             action_compare2(sender, msg, ws)
+        elif action == 'votes':
+            action_vote(sender, msg, ws)
+        elif action == 'votes2':
+            action_vote2(sender, msg, ws)
+
+
+def action_vote(sender, msg, ws):
+    shuffle(msg['votes'])
+    for i, name in enumerate(name_ws_dict.keys()):
+        jd = {'action': 'votes', 'msg': {}}
+        jd['msg']['source'] = sender
+        jd['msg']['vote'] = msg['votes'][i]
+        send_target(json.dumps(jd), name)
+
+
+def action_vote2(sender, msg, ws):
+    jd = {'action': 'votes2', 'msg': msg}
+    jd['msg']['source'] = sender
+    send_broadcast(json.dumps(jd))
 
 
 def action_compare(sender, msg, ws):

@@ -216,9 +216,12 @@ void GameLayer::onOpen(cocos2d::network::WebSocket* ws)
 void GameLayer::onMessage(cocos2d::network::WebSocket* ws, const cocos2d::network::WebSocket::Data& data)
 {
         std::string textStr = data.bytes;
+		
 		Document doc;
 		doc.Parse(textStr.c_str());
 		const char *action = doc["action"].GetString();
+		CCLOG(action);
+		CCLOG(textStr.c_str());
 		if (strcmp(action,"create") == 0){
 			recvCreate(doc["msg"].GetObjectW());
 		}
@@ -243,8 +246,13 @@ void GameLayer::onMessage(cocos2d::network::WebSocket* ws, const cocos2d::networ
 		else if (strcmp(action, "compare2") == 0){
 			recvCompare2(doc["msg"].GetObjectW());
 		}
-		CCLOG(action);
-        CCLOG(textStr.c_str());
+		else if (strcmp(action, "votes") == 0){
+			recvVotes(doc["msg"].GetObjectW());
+		}
+		else if (strcmp(action, "votes2") == 0){
+			recvVotes2(doc["msg"].GetObjectW());
+		}
+		
 }
  
 // Á¬½Ó¹Ø±Õ
@@ -378,6 +386,44 @@ void GameLayer::sendCompare2(String targetId, list<string> &msgList){
 	sendMessage(buffer.GetString());
 }
 
+void GameLayer::sendVotes(int voteArr[], int n){
+	Document doc;
+	Document::AllocatorType& allocator = doc.GetAllocator();
+	doc.SetObject();
+	string tempStr = me->getID();
+	doc.AddMember("id", JsonValue(StringRef(tempStr.c_str())).Move(), allocator);
+	doc.AddMember("action", JsonValue("votes").Move(), allocator);
+	Document msg;
+	msg.SetObject();
+	JsonValue votes(kArrayType);
+	for (int i = 0; i < n; i++){
+		votes.PushBack(JsonValue(voteArr[i]).Move(), allocator);
+	}
+	msg.AddMember("votes", votes, msg.GetAllocator());
+	doc.AddMember("msg", msg, allocator);
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	doc.Accept(writer);
+	sendMessage(buffer.GetString());
+}
+
+void GameLayer::sendVotes2(int voteSum){
+	Document doc;
+	Document::AllocatorType& allocator = doc.GetAllocator();
+	doc.SetObject();
+	string tempStr = me->getID();
+	doc.AddMember("id", JsonValue(StringRef(tempStr.c_str())).Move(), allocator);
+	doc.AddMember("action", JsonValue("votes2").Move(), allocator);
+	Document msg;
+	msg.SetObject();
+	msg.AddMember("voteSum", JsonValue(voteSum).Move(), msg.GetAllocator());
+	doc.AddMember("msg", msg, allocator);
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	doc.Accept(writer);
+	sendMessage(buffer.GetString());
+}
+
 void GameLayer::recvLogin2(JsonValue msg){
 	JsonValue users = msg["users"].GetArray();
 	userCount = 0;
@@ -432,6 +478,18 @@ void GameLayer::recvCompare2(JsonValue msg){
 		msgList.push_back(msgs[i].GetString());
 	}
 	doCompare2(sourceId, msgList);
+}
+
+void GameLayer::recvVotes(JsonValue msg){
+	string sourceId = msg["source"].GetString();
+	int vote = msg["vote"].GetInt();
+	doVotes(sourceId, vote);
+}
+
+void GameLayer::recvVotes2(JsonValue msg){
+	string sourceId = msg["source"].GetString();
+	int voteSum = msg["voteSum"].GetInt();
+	doVotes2(sourceId, voteSum);
 }
 
 void GameLayer::doLogin2(){
@@ -514,4 +572,13 @@ void GameLayer::doCompare2(string sourceId, list<string> &msgList){
 	BigNum x(*(me->getX()));
 	bool result = millionRich(me->getLevel(), x, val);
 	CCLOG("%d", result);
+}
+
+void GameLayer::doVotes(string sourceId, int vote){
+	CCLOG("doVotes:%s,%d", sourceId.c_str(), vote);
+}
+
+void GameLayer::doVotes2(string sourceId, int voteSum){
+	CCLOG("doVotes2:%s,%d", sourceId.c_str(), voteSum);
+
 }
