@@ -51,6 +51,7 @@ private:
 	MenuItemImage* buttonIdentify;
 	MenuItemImage* buttonCompare;
 	MenuItemImage* buttonOpenBox;
+	MenuItemImage* box;
 	int userCount;
 	unordered_map<string, ParaBoy*> idMap;
 	void jsonTest();

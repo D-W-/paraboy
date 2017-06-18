@@ -55,6 +55,7 @@ bool GameLayer::init()
 	//me->setPosition(0, 0);
 	//this->addChild(me, 1);
 
+	//init box
 
 	// bind touch event实现触摸效果
 	auto touchListener = EventListenerTouchOneByOne::create();
