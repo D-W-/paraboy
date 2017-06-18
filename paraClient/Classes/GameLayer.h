@@ -66,6 +66,8 @@ public:
 	void sendAuth2(String targetId, String auth2Msg);
 	void sendCompare(String targetId, String compMsg);
 	void sendCompare2(String targetId, list<String> &msgList);
+	void sendVotes(int voteArr[], int n);
+	void sendVotes2(int voteSum);
 
 	// receive actions
 	void recvLogin2(JsonValue msg);
@@ -76,6 +78,8 @@ public:
 	void recvRemove(JsonValue msg);
 	void recvCompare(JsonValue msg);
 	void recvCompare2(JsonValue msg);
+	void recvVotes(JsonValue msg);
+	void recvVotes2(JsonValue msg);
 
 	// response actions
 	void doLogin2();
@@ -86,5 +90,7 @@ public:
 	void doRemove(string id);
 	void doCompare(string sourceId, string compMsg);
 	void doCompare2(string sourceId, list<string> &msgList);
+	void doVotes(string sourceId, int vote);
+	void doVotes2(string sourceId, int voteSum);
 };
 #endif /* defined(__GAMELAYER_H__) */
