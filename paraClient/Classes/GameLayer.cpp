@@ -361,7 +361,7 @@ void GameLayer::doCreate(string id, int x, int y, string d, string n){
 	CCLOG("doCreate:%s,%d,%d,%s,%s", id.c_str(), x, y, d.c_str(), n.c_str());
 	stringstream ss;
 	ss << userCount;
-	string userImage = "icon" + ss.str() + ".jpg", backImage = "bicon" + ss.str() + ".jpg";
+	string userImage = "icon" + ss.str() + ".jpg", backImage = "icon" + ss.str() + "b.jpg";
 	ParaBoy* current = ParaBoy::create(userImage, backImage, CC_CALLBACK_1(GameLayer::createButton, this, id));
 	if (id == me->getID()) {
 		string e = me->getPrivateKey();
