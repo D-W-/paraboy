@@ -376,7 +376,10 @@ void GameLayer::sendCompare2(String targetId, list<string> &msgList){
 	msg.AddMember("target", JsonValue(StringRef(targetId.getCString())).Move(), msg.GetAllocator());
 	JsonValue msgs(kArrayType);
 	for (string t : msgList){
-		msgs.PushBack(JsonValue(StringRef(t.c_str())).Move(), allocator);
+		char * writable = new char[t.size() + 1];
+		std::copy(t.begin(), t.end(), writable);
+		writable[t.size()] = '\0';
+		msgs.PushBack(JsonValue(StringRef(writable)).Move(), allocator);
 	}
 	msg.AddMember("msgs", msgs, msg.GetAllocator());
 	doc.AddMember("msg", msg, allocator);
@@ -508,6 +511,7 @@ void GameLayer::doCreate(string id, int x, int y, string d, string n){
 		me->removeFromParentAndCleanup(true);
 		me = current;
 	}
+	current->setLevel(atoi(id.c_str()));
 	current->setId(id);
 	current->setPublicKey(d, n);
 	current->setPosition(toRealLocation(x, y));
@@ -571,7 +575,10 @@ void GameLayer::doCompare2(string sourceId, list<string> &msgList){
 	}
 	BigNum x(*(me->getX()));
 	bool result = millionRich(me->getLevel(), x, val);
-	CCLOG("%d", result);
+	if (!result)
+		CCLOG("HIGHER");
+	else
+		CCLOG("LOWER");
 }
 
 void GameLayer::doVotes(string sourceId, int vote){

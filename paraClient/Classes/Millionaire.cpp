@@ -70,7 +70,7 @@ level:BobµÄ¾üÏÎ
 
 bool millionRich(int level,BigNum& x,vector<BigNum>reply) {
 	BigNum p = reply[0];
-	cout << x % p << "   judge  " << reply[level];
+	//cout << x % p << "   judge  " << reply[level];
 	return x % p == reply[level];
 }
 
