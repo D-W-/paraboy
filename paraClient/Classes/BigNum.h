@@ -23,7 +23,7 @@ public:
 public:
 	BigNum();
 	BigNum(string str);
-	BigNum(BigNum& other);
+	BigNum(const BigNum& other);
 
 	int operator!();
 	BigNum&operator=(const BigNum&a);

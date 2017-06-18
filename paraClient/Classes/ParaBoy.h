@@ -22,6 +22,8 @@ private:
 	int codeX;
 	int codeY;
 	RSA* rsa;
+	int level;
+	BigNum* x;
 public:
 	ParaBoy();
 	void setId(string id);
@@ -36,6 +38,10 @@ public:
 
 	string getCipher();
 	string verifyCipher(string cipher);
+	int getLevel();
+	void setLevel(int level);
+	BigNum* getX();
+	void setX(BigNum& x);
 };
 
 #endif // !__PAPABOY_H__

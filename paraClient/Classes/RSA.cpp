@@ -1,3 +1,4 @@
+#pragma once
 #include "Utils.cpp"
 
 using namespace std;
@@ -98,8 +99,16 @@ public:
 		BigNum msg = Utils::modPow(*cipher, *d, *n);
 		return this->_decode(msg);
 	}
+	
+	BigNum decrypt(BigNum ciphertext, BigNum d, BigNum n) {
+		return Utils::modPow(ciphertext, d, n);
+	}
 
-	string bigNumToStr(BigNum& bignum) {
+	BigNum encrypt(BigNum message, BigNum e, BigNum n) {
+		return Utils::modPow(message, e, n);
+	}
+
+	static string bigNumToStr(BigNum& bignum) {
 		std::ostringstream oss;
 		oss << bignum << endl;
 		return oss.str().substr(0, oss.str().length() - 1);

@@ -24,12 +24,11 @@ bool BeginLayer::init()
 
 	//ÊäÈë¿ò
 	std::string pNormalSprite = "edit.png";
-	auto _editName = EditBox::create(Size(550, 88), ui::Scale9Sprite::create(pNormalSprite));
-	_editName->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height * 3 / 4));
+	auto _editName = EditBox::create(Size(250, 88), ui::Scale9Sprite::create(pNormalSprite));
+	_editName->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height * 19 / 32));
 	_editName->setFontName("Paint Boy");
 	_editName->setFontSize(25);
 	_editName->setFontColor(Color3B::WHITE);
-	_editName->setPlaceHolder("ID:");
 	_editName->setPlaceholderFontColor(Color3B::WHITE);
 	_editName->setMaxLength(8);
 	_editName->setReturnType(ui::EditBox::KeyboardReturnType::DONE);

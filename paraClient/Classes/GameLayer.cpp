@@ -148,8 +148,8 @@ void GameLayer::createButton(Ref* pSender, string id)
 		menu->addChild(buttonIdentify, 2);
 	}
 	if (buttonCompare == NULL) {
-		buttonCompare = MenuItemImage::create("button0.png", "button0b.png", CC_CALLBACK_1(GameLayer::onCompare, this, me->getID(), id));
-		buttonCompare->setPosition(600, 150);
+		buttonCompare = MenuItemImage::create("button1.png", "button1b.png", CC_CALLBACK_1(GameLayer::onCompare, this, me->getID(), id));
+		buttonCompare->setPosition(600, 200);
 		menu->addChild(buttonCompare, 2);
 	}
 }
@@ -162,7 +162,18 @@ void GameLayer::onIdentify(Ref * pSender, string sender, string receiver)
 
 void GameLayer::onCompare(Ref * pSender, string sender, string receiver)
 {
-	CCLOG("Clikcked");
+	CCLOG("Clikcked compare");
+	String msg = "";
+	ParaBoy* bob = idMap[sender], *alice = idMap[receiver];
+	string d, n;
+	alice->getPublicKey(d, n);
+	BigNum* bd = new BigNum(d), *bn = new BigNum(n);
+	vector<BigNum> result = millionSendMessage(bob->getLevel(), make_pair(*bn, *bd));
+	if (result.size() > 1) {
+		msg = RSA::bigNumToStr(result[1]);
+		me->setX(result[0]);
+		sendCompare(receiver, msg);
+	}
 }
 
 void GameLayer::onOpenBox(Ref * pSender, string id)
@@ -345,7 +356,7 @@ void GameLayer::sendCompare(String targetId, String compMsg){
 	sendMessage(buffer.GetString());
 }
 
-void GameLayer::sendCompare2(String targetId, list<String> &msgList){
+void GameLayer::sendCompare2(String targetId, list<string> &msgList){
 	Document doc;
 	Document::AllocatorType& allocator = doc.GetAllocator();
 	doc.SetObject();
@@ -356,8 +367,8 @@ void GameLayer::sendCompare2(String targetId, list<String> &msgList){
 	msg.SetObject();
 	msg.AddMember("target", JsonValue(StringRef(targetId.getCString())).Move(), msg.GetAllocator());
 	JsonValue msgs(kArrayType);
-	for (String t : msgList){
-		msgs.PushBack(JsonValue(StringRef(t.getCString())).Move(), allocator);
+	for (string t : msgList){
+		msgs.PushBack(JsonValue(StringRef(t.c_str())).Move(), allocator);
 	}
 	msg.AddMember("msgs", msgs, msg.GetAllocator());
 	doc.AddMember("msg", msg, allocator);
@@ -481,7 +492,26 @@ void GameLayer::doRemove(string id)
 
 void GameLayer::doCompare(string sourceId, string compMsg){
 	CCLOG("doCompare:%s,%s", sourceId.c_str(), compMsg.c_str());
+	string pe = me->getPrivateKey(), pn, pd;
+	me->getPublicKey(pd, pn);
+	BigNum* e = new BigNum(pe), *n = new BigNum(pn);
+	BigNum* msg = new BigNum(compMsg);
+	vector<BigNum> result = millionDealMessage(me->getLevel(), make_pair(*n, *e), *msg);
+	list<string> val;
+	for (auto i : result) {
+		val.push_back(RSA::bigNumToStr(i));
+	}
+	sendCompare2(sourceId, val);
 }
+
 void GameLayer::doCompare2(string sourceId, list<string> &msgList){
 	CCLOG("doCompare2:%s,%s", sourceId.c_str(), msgList.front().c_str());
+	vector<BigNum> val;
+	for (string i : msgList) {
+		BigNum temp(i);
+		val.push_back(temp);
+	}
+	BigNum x(*(me->getX()));
+	bool result = millionRich(me->getLevel(), x, val);
+	CCLOG("%d", result);
 }

@@ -271,7 +271,7 @@ BigNum::BigNum(string str) {
 	sgn = 1;
 }
 
-BigNum::BigNum(BigNum& other) {
+BigNum::BigNum(const BigNum& other) {
 	(*this) = other;
 }
 

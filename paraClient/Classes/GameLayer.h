@@ -3,6 +3,8 @@
 
 #include "cocos2d.h"
 #include "ParaBoy.h"
+#include "RSA.cpp"
+#include "Millionaire.h"
 #include "network/WebSocket.h"
 #include "json/document.h"
 #include "json/writer.h"
@@ -68,7 +70,7 @@ public:
 	void sendAuth(String targetId, String authMsg);
 	void sendAuth2(String targetId, String auth2Msg);
 	void sendCompare(String targetId, String compMsg);
-	void sendCompare2(String targetId, list<String> &msgList);
+	void sendCompare2(String targetId, list<string> &msgList);
 
 	// receive actions
 	void recvLogin2(JsonValue msg);

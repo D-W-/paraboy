@@ -4,7 +4,8 @@ ParaBoy::ParaBoy():
 	id(""),
 	privateE(""),
 	publicD(""),
-	publicN("")
+	publicN(""),
+	level(1)
 {
 
 }
@@ -81,4 +82,24 @@ string ParaBoy::verifyCipher(string cipher)
 	if (publicD != "")
 		result = rsa->decrypt(cipher, publicD, publicN);
 	return result;
+}
+
+int ParaBoy::getLevel()
+{
+	return this->level;
+}
+
+void ParaBoy::setLevel(int level)
+{
+	this->level = level;
+}
+
+BigNum* ParaBoy::getX()
+{
+	return this->x;
+}
+
+void ParaBoy::setX(BigNum & x)
+{
+	this->x = new BigNum(x);
 }
