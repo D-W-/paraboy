@@ -1,4 +1,4 @@
-#include <Rsa\RSA.h>
+#include <Rsa\RSA.cpp>
 
 #include <string>
 #include <unordered_map>

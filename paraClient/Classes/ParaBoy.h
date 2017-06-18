@@ -4,10 +4,10 @@
 
 #include "cocos2d.h"
 #include "string"
-#include <RSA\RSA.h>
+#include <RSA.cpp>
 
 // 128位的十进制位数, 一个int表示4个digit
-#define RSA_KEY_LENGTH 10
+#define RSA_KEY_LENGTH 20
 
 USING_NS_CC;
 using namespace std;
@@ -29,10 +29,13 @@ public:
 	void initRSA();
 	//String getSSID();
 	static ParaBoy* create(const std::string& normalImage, const std::string& selectedImage, const ccMenuCallback& callback);
-	void getPrivateKey(string& e, string& n);
+	string getPrivateKey();
 	void getPublicKey(string& d, string& n);
-	void setPrivateKey(string e, string n);
+	void setPrivateKey(string e);
 	void setPublicKey(string d, string n);
+
+	string getCipher();
+	string verifyCipher(string cipher);
 };
 
 #endif // !__PAPABOY_H__

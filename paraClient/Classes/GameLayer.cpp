@@ -153,7 +153,8 @@ void GameLayer::createButton(Ref* pSender, string id)
 
 void GameLayer::onIdentify(Ref * pSender, string sender, string receiver)
 {
-	CCLOG("Clikcked");
+	CCLOG("Clikcked identify");
+	sendAuth(receiver, me->getCipher());
 }
 
 void GameLayer::onCompare(Ref * pSender, string sender, string receiver)
@@ -362,7 +363,10 @@ void GameLayer::doCreate(string id, int x, int y, string d, string n){
 	ss << userCount;
 	string userImage = "icon" + ss.str() + ".jpg", backImage = "bicon" + ss.str() + ".jpg";
 	ParaBoy* current = ParaBoy::create(userImage, backImage, CC_CALLBACK_1(GameLayer::createButton, this, id));
-	if (id == me->getID()){
+	if (id == me->getID()) {
+		string e = me->getPrivateKey();
+		current->setPrivateKey(e);
+		me->removeFromParentAndCleanup(true);
 		me = current;
 	}
 	current->setId(id);
@@ -380,14 +384,22 @@ void GameLayer::doMove(string id, int x, int y){
 	current->runAction(MoveTo::create(0.3, toRealLocation(x, y)));
 }
 
-void GameLayer::doAuth(string sourceId, string authMsg){
+void GameLayer::doAuth(string sourceId, string authMsg) {
 	//need wanghan to finish...
-	CCLOG("doAuth:%s,%s", sourceId, authMsg);
+	CCLOG("doAuth:%s,%s", sourceId.c_str(), authMsg.c_str());
+	ParaBoy* current = idMap[sourceId];
+	string result = current->verifyCipher(authMsg);
+	if (result == "helloworld")
+		sendAuth2(sourceId, "1");
+	else
+		sendAuth2(sourceId, "0");
 }
 
 void GameLayer::doAuth2(string sourceId, string auth2Msg){
 	//need wanghan to finish...
-	CCLOG("doAuth:%s,%s", sourceId, auth2Msg);
+	CCLOG("doAuth:%s,%s", sourceId.c_str(), auth2Msg.c_str());
+	if (auth2Msg == "1")
+		CCLOG("Success");
 }
 
 void GameLayer::doRemove(string id)

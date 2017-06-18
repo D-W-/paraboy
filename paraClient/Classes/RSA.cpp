@@ -62,17 +62,26 @@ private:
 public:
 
 	RSA(int keySize) : RSA_KEY_LENGTH(keySize) {
-		generateKeys();
+		//generateKeys();
 	}
 
 	RSA() {
 		RSA_KEY_LENGTH = 10;
-		generateKeys();
+		//generateKeys();
 	}
 
 	string encrypt(string message) {
 		BigNum msg = this->_encode(message);
 		BigNum cipher = this->_encrypt(msg);
+		return bigNumToStr(cipher);
+	}
+
+	string encrypt(string message, string _e, string _n) {
+		BigNum* e = new BigNum(_e);
+		BigNum* n = new BigNum(_n);
+
+		BigNum msg = this->_encode(message);
+		BigNum cipher = Utils::modPow(msg, *e, *n);
 		return bigNumToStr(cipher);
 	}
 
@@ -83,17 +92,17 @@ public:
 	}
 
 	string decrypt(string message, string _d, string _n) {
-		BigNum d(_d);
-		BigNum n(_n);
-		BigNum cipher(message);
-		BigNum msg = Utils::modPow(cipher, d, n);
+		BigNum* d = new BigNum(_d);
+		BigNum* n = new BigNum(_n);
+		BigNum* cipher = new BigNum(message);
+		BigNum msg = Utils::modPow(*cipher, *d, *n);
 		return this->_decode(msg);
 	}
 
 	string bigNumToStr(BigNum& bignum) {
 		std::ostringstream oss;
 		oss << bignum << endl;
-		return oss.str().substr(0, oss.str().length()-1);
+		return oss.str().substr(0, oss.str().length() - 1);
 	}
 
 	void generateKeys() {
@@ -133,7 +142,7 @@ public:
 	BigNum getQ() {
 		return this->q;
 	}
-	
+
 	void print() {
 		cout << p << endl;
 		cout << q << endl;
