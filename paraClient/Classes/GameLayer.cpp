@@ -55,6 +55,11 @@ bool GameLayer::init()
 	//me->setPosition(0, 0);
 	//this->addChild(me, 1);
 
+	//init label
+	label = Label::createWithSystemFont("", "Arial", 24);
+	label->setPosition(1100, 80);
+	this->addChild(label, 1);
+
 	//init box
 	box = ParaBoy::create("gold.jpg", "goldb.jpg", CC_CALLBACK_1(GameLayer::createOpenBoxButton, this));
 	box->setPosition(144, 144);
@@ -584,8 +589,10 @@ void GameLayer::doAuth2(string sourceId, string auth2Msg){
 	//need wanghan to finish...
 
 	CCLOG("doAuth2:%s,%s", sourceId.c_str(), auth2Msg.c_str());
-	if (auth2Msg == "1")
+	if (auth2Msg == "1") {
+		this->label->setString("Success");
 		CCLOG("Success");
+	}
 }
 
 void GameLayer::doRemove(string id)
@@ -617,10 +624,14 @@ void GameLayer::doCompare2(string sourceId, list<string> &msgList){
 	}
 	BigNum x(*(me->getX()));
 	bool result = millionRich(me->getLevel(), x, val);
-	if (!result)
+	if (!result) {
+		this->label->setString("HIGHER");
 		CCLOG("HIGHER");
-	else
+	}
+	else {
+		this->label->setString("LOWER");
 		CCLOG("LOWER");
+	}
 }
 
 void GameLayer::doVotes(string sourceId, int vote){
@@ -636,6 +647,7 @@ void GameLayer::doBox(int minNumber, list<string> &userList){
 	CCLOG("doBox:%d,%s",minNumber, userList.front().c_str());
 	if (minNumber == userList.size()) {
 		CCLOG("success");
+		this->label->setString("OpenSuccessful");
 		this->box->removeFromParentAndCleanup(true);
 		this->box = NULL;
 	}

@@ -47,8 +47,9 @@ public:
 	virtual void onClose(cocos2d::network::WebSocket* ws);
 	virtual void onError(cocos2d::network::WebSocket* ws, const cocos2d::network::WebSocket::ErrorCode& error);
 private:
+	Label *label;
 	Sprite* gameBackground;
-	CCMenu* menu;
+	Menu* menu;
 	//point to current user, can get publicKey, privateKey, ID, SSID from here
 	ParaBoy* me;
 	MenuItemImage* buttonIdentify;
