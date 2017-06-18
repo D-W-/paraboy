@@ -4,6 +4,7 @@ from flask import Flask
 from flask_sockets import Sockets
 import json
 from random import randint
+import util
 
 app = Flask(__name__)
 sockets = Sockets(app)
@@ -59,6 +60,7 @@ def remove_ws(ws):
     if key_to_remove is not None:
         del name_ws_dict[key_to_remove]
         name_list.remove(key_to_remove)
+        action_remove(key_to_remove)
 
 
 def get_init_pos():
@@ -78,18 +80,16 @@ def get_box_secret():
     return 1, 1  # add code later...
 
 
+def action_remove(id_to_remove):
+    jd = {'action': 'remove', 'msg': {'id':id_to_remove}}
+    send_broadcast(json.dumps(jd))
+
+
 def action_login(sender, msg, ws):
     user_list = []
     for name in name_list:
         t = name_ws_dict[name]
         user_dic = {"id": t.id, "x": t.p_x, "y": t.p_y, "d": t.pub_d, "n": t.pub_n, "bx": t.b_x, "by": t.b_y}
-        # user_dic['id'] = name_ws_dict[name].id
-        # user_dic['p_x'] = name_ws_dict[name].p_x
-        # user_dic['p_y'] = name_ws_dict[name].p_y
-        # user_dic['pub_d'] = name_ws_dict[name].pub_d
-        # user_dic['pub_n'] = name_ws_dict[name].pub_n
-        # user_dic['b_x'] = name_ws_dict[name].b_x
-        # user_dic['b_y'] = name_ws_dict[name].b_y
         user_list.append(user_dic)
 
     tmp_jd = {'action': 'login2', 'msg': {}}

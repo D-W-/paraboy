@@ -194,7 +194,7 @@ void GameLayer::onOpen(cocos2d::network::WebSocket* ws)
 	me->getPublicKey(d, n);
 	sendLogin(name, d, n);
 	//sendMove(5, 5);
-	//sendAuth(name, "asjdhgfalkdjshfgaskdhfakldsfhakdfhlaldshf");
+	//sendAuth(me->getID(), "asjdhgfalkdjshfgaskdhfakldsfhakdfhlaldshf");
 	//sendAuth2(name, "kljhlkhasdkflhasdjhflkjsflkdhsfagsdsfhlja");
 }
  
@@ -219,6 +219,9 @@ void GameLayer::onMessage(cocos2d::network::WebSocket* ws, const cocos2d::networ
 		}
 		else if (strcmp(action, "login2") == 0){
 			recvLogin2(doc["msg"].GetObjectW());
+		}
+		else if (strcmp(action, "remove") == 0){
+			recvRemove(doc["msg"].GetObjectW());
 		}
 		CCLOG(action);
         CCLOG(textStr.c_str());
@@ -352,6 +355,10 @@ void GameLayer::recvAuth2(JsonValue msg){
 	doAuth2(sourceId, auth2Msg);
 }
 
+void GameLayer::recvRemove(JsonValue msg){
+	doRemove(msg["id"].GetString());
+}
+
 void GameLayer::doLogin2(){
 
 }
@@ -382,12 +389,12 @@ void GameLayer::doMove(string id, int x, int y){
 
 void GameLayer::doAuth(string sourceId, string authMsg){
 	//need wanghan to finish...
-	CCLOG("doAuth:%s,%s", sourceId, authMsg);
+	CCLOG("doAuth:%s,%s", sourceId.c_str(), authMsg.c_str());
 }
 
 void GameLayer::doAuth2(string sourceId, string auth2Msg){
 	//need wanghan to finish...
-	CCLOG("doAuth:%s,%s", sourceId, auth2Msg);
+	CCLOG("doAuth:%s,%s", sourceId.c_str(), auth2Msg.c_str());
 }
 
 void GameLayer::doRemove(string id)

@@ -71,6 +71,7 @@ public:
 	void recvMove(JsonValue msg);
 	void recvAuth(JsonValue msg);
 	void recvAuth2(JsonValue msg);
+	void recvRemove(JsonValue msg);
 
 	// response actions
 	void doLogin2();
