@@ -31,9 +31,10 @@ public:
 
 	CREATE_FUNC(GameLayer);
 	void createButton(Ref * pSender, string id);
+	void createOpenBoxButton(Ref* pSender);
 	void onIdentify(Ref* pSender, string sender, string receiver);
 	void onCompare(Ref* pSender, string sender, string receiver);
-	void onOpenBox(Ref* pSender, string id);
+	void onOpenBox(Ref* pSender);
 
 	void sendMessage(String message);
 	void closeSocket();

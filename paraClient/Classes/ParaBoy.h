@@ -42,6 +42,9 @@ public:
 	void setLevel(int level);
 	BigNum* getX();
 	void setX(BigNum& x);
+	void setCode(int x, int y);
+	int getCodeX();
+	int getCodeY();
 };
 
 #endif // !__PAPABOY_H__

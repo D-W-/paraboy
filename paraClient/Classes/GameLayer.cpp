@@ -56,6 +56,9 @@ bool GameLayer::init()
 	//this->addChild(me, 1);
 
 	//init box
+	box = ParaBoy::create("gold.jpg", "goldb.jpg", CC_CALLBACK_1(GameLayer::createOpenBoxButton, this));
+	box->setPosition(144, 144);
+	this->menu->addChild(box, 1);
 
 	// bind touch event实现触摸效果
 	auto touchListener = EventListenerTouchOneByOne::create();
@@ -154,6 +157,15 @@ void GameLayer::createButton(Ref* pSender, string id)
 	}
 }
 
+void GameLayer::createOpenBoxButton(Ref * pSender)
+{
+	if (buttonOpenBox == NULL) {
+		buttonOpenBox = MenuItemImage::create("button2.png", "button2b.png", CC_CALLBACK_1(GameLayer::onOpenBox, this));
+		buttonOpenBox->setPosition(600, 300);
+		menu->addChild(buttonOpenBox, 2);
+	}
+}
+
 void GameLayer::onIdentify(Ref * pSender, string sender, string receiver)
 {
 	CCLOG("Clikcked identify");
@@ -176,9 +188,10 @@ void GameLayer::onCompare(Ref * pSender, string sender, string receiver)
 	}
 }
 
-void GameLayer::onOpenBox(Ref * pSender, string id)
+void GameLayer::onOpenBox(Ref * pSender)
 {
-	CCLOG("CLicked");
+	CCLOG("CLicked openBox");
+	sendBox(this->me->getCodeX());
 }
 
 void GameLayer::sendMessage(String message)
@@ -621,4 +634,10 @@ void GameLayer::doVotes2(string sourceId, int voteSum){
 
 void GameLayer::doBox(int minNumber, list<string> &userList){
 	CCLOG("doBox:%d,%s",minNumber, userList.front().c_str());
+	if (minNumber == userList.size()) {
+		CCLOG("success");
+		this->box->removeFromParentAndCleanup(true);
+		this->box = NULL;
+	}
+
 }

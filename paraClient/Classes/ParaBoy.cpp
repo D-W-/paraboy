@@ -5,7 +5,9 @@ ParaBoy::ParaBoy():
 	privateE(""),
 	publicD(""),
 	publicN(""),
-	level(1)
+	level(1),
+	codeX(0),
+	codeY(0)
 {
 
 }
@@ -102,4 +104,20 @@ BigNum* ParaBoy::getX()
 void ParaBoy::setX(BigNum & x)
 {
 	this->x = new BigNum(x);
+}
+
+void ParaBoy::setCode(int x, int y)
+{
+	this->codeX = x;
+	this->codeY = y;
+}
+
+int ParaBoy::getCodeX()
+{
+	return this->codeX;
+}
+
+int ParaBoy::getCodeY()
+{
+	return this->codeY;
 }
