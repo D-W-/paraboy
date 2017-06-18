@@ -223,6 +223,12 @@ void GameLayer::onMessage(cocos2d::network::WebSocket* ws, const cocos2d::networ
 		else if (strcmp(action, "remove") == 0){
 			recvRemove(doc["msg"].GetObjectW());
 		}
+		else if (strcmp(action, "compare") == 0){
+			recvCompare(doc["msg"].GetObjectW());
+		}
+		else if (strcmp(action, "compare2") == 0){
+			recvCompare2(doc["msg"].GetObjectW());
+		}
 		CCLOG(action);
         CCLOG(textStr.c_str());
 }
@@ -318,6 +324,46 @@ void GameLayer::sendAuth2(String targetId, String auth2Msg){
 	sendMessage(buffer.GetString());
 }
 
+void GameLayer::sendCompare(String targetId, String compMsg){
+	Document doc;
+	Document::AllocatorType& allocator = doc.GetAllocator();
+	doc.SetObject();
+	string tempStr = me->getID();
+	doc.AddMember("id", JsonValue(StringRef(tempStr.c_str())).Move(), allocator);
+	doc.AddMember("action", JsonValue("compare").Move(), allocator);
+	Document msg;
+	msg.SetObject();
+	msg.AddMember("target", JsonValue(StringRef(targetId.getCString())).Move(), msg.GetAllocator());
+	msg.AddMember("compMsg", JsonValue(StringRef(compMsg.getCString())).Move(), msg.GetAllocator());
+	doc.AddMember("msg", msg, allocator);
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	doc.Accept(writer);
+	sendMessage(buffer.GetString());
+}
+
+void GameLayer::sendCompare2(String targetId, list<String> &msgList){
+	Document doc;
+	Document::AllocatorType& allocator = doc.GetAllocator();
+	doc.SetObject();
+	string tempStr = me->getID();
+	doc.AddMember("id", JsonValue(StringRef(tempStr.c_str())).Move(), allocator);
+	doc.AddMember("action", JsonValue("compare2").Move(), allocator);
+	Document msg;
+	msg.SetObject();
+	msg.AddMember("target", JsonValue(StringRef(targetId.getCString())).Move(), msg.GetAllocator());
+	JsonValue msgs(kArrayType);
+	for (String t : msgList){
+		msgs.PushBack(JsonValue(StringRef(t.getCString())).Move(), allocator);
+	}
+	msg.AddMember("msgs", msgs, msg.GetAllocator());
+	doc.AddMember("msg", msg, allocator);
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	doc.Accept(writer);
+	sendMessage(buffer.GetString());
+}
+
 void GameLayer::recvLogin2(JsonValue msg){
 	JsonValue users = msg["users"].GetArray();
 	userCount = 0;
@@ -359,6 +405,21 @@ void GameLayer::recvRemove(JsonValue msg){
 	doRemove(msg["id"].GetString());
 }
 
+void GameLayer::recvCompare(JsonValue msg){
+	string sourceId = msg["source"].GetString();
+	string compMsg = msg["compMsg"].GetString();
+	doCompare(sourceId, compMsg);
+}
+void GameLayer::recvCompare2(JsonValue msg){
+	string sourceId = msg["source"].GetString();
+	JsonValue msgs = msg["msgs"].GetArray();
+	list<string> msgList;
+	for (SizeType i = 0; i < msgs.Size(); i++){
+		msgList.push_back(msgs[i].GetString());
+	}
+	doCompare2(sourceId, msgList);
+}
+
 void GameLayer::doLogin2(){
 
 }
@@ -394,11 +455,18 @@ void GameLayer::doAuth(string sourceId, string authMsg){
 
 void GameLayer::doAuth2(string sourceId, string auth2Msg){
 	//need wanghan to finish...
-	CCLOG("doAuth:%s,%s", sourceId.c_str(), auth2Msg.c_str());
+	CCLOG("doAuth2:%s,%s", sourceId.c_str(), auth2Msg.c_str());
 }
 
 void GameLayer::doRemove(string id)
 {
 	ParaBoy* toRemove = idMap[id];
 	toRemove->removeFromParentAndCleanup(true);
+}
+
+void GameLayer::doCompare(string sourceId, string compMsg){
+	CCLOG("doCompare:%s,%s", sourceId.c_str(), compMsg.c_str());
+}
+void GameLayer::doCompare2(string sourceId, list<string> &msgList){
+	CCLOG("doCompare2:%s,%s", sourceId.c_str(), msgList.front().c_str());
 }
