@@ -18,7 +18,7 @@ bool BeginLayer::init()
 	Point origin = Director::getInstance()->getVisibleOrigin();
 
 	//±³¾°³õÊ¼»¯
-	auto gameBackground = Sprite::create("bg.jpg");
+	auto gameBackground = Sprite::create("bg0.jpg");
 	gameBackground->setPosition(Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 	this->addChild(gameBackground, 0);
 
