@@ -1,6 +1,10 @@
 #include "ParaBoy.h"
 
-ParaBoy::ParaBoy()
+ParaBoy::ParaBoy():
+	id(""),
+	privateE(""),
+	publicD(""),
+	publicN("")
 {
 
 }
@@ -24,7 +28,6 @@ void ParaBoy::initRSA()
 	this->publicN = rsa->getN();
 }
 
-
 ParaBoy * ParaBoy::create(const std::string & normalImage, const std::string & selectedImage, const ccMenuCallback & callback)
 {
 	ParaBoy *ret = new (std::nothrow) ParaBoy();
@@ -37,10 +40,9 @@ ParaBoy * ParaBoy::create(const std::string & normalImage, const std::string & s
 	return nullptr;
 }
 
-void ParaBoy::getPrivateKey(string & e, string & n)
+string ParaBoy::getPrivateKey()
 {
-	e = this->privateE;
-	n = this->publicN;
+	return this->privateE;
 }
 
 void ParaBoy::getPublicKey(string & d, string & n)
@@ -49,14 +51,34 @@ void ParaBoy::getPublicKey(string & d, string & n)
 	n = this->publicN;
 }
 
-void ParaBoy::setPrivateKey(string e, string n)
+void ParaBoy::setPrivateKey(string e)
 {
 	this->privateE = e;
-	this->publicN = n;
+
 }
 
 void ParaBoy::setPublicKey(string d, string n)
 {
 	this->publicD = d;
 	this->publicN = n;
+}
+
+string ParaBoy::getCipher()
+{
+	string result = "";
+	if (rsa == NULL) 
+		rsa = new RSA(RSA_KEY_LENGTH);
+	if (privateE != "")
+		result = rsa->encrypt("helloworld", privateE, publicN);
+	return result;
+}
+
+string ParaBoy::verifyCipher(string cipher)
+{
+	string result = "";
+	if (rsa == NULL)
+		rsa = new RSA(RSA_KEY_LENGTH);
+	if (publicD != "")
+		result = rsa->decrypt(cipher, publicD, publicN);
+	return result;
 }
