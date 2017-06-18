@@ -73,7 +73,7 @@ public:
 	void sendCompare2(String targetId, list<string> &msgList);
 	void sendVotes(int voteArr[], int n);
 	void sendVotes2(int voteSum);
-
+	void sendBox(int key);
 	// receive actions
 	void recvLogin2(JsonValue msg);
 	void recvCreate(JsonValue msg);
@@ -85,7 +85,7 @@ public:
 	void recvCompare2(JsonValue msg);
 	void recvVotes(JsonValue msg);
 	void recvVotes2(JsonValue msg);
-
+	void recvBox(JsonValue msg);
 	// response actions
 	void doLogin2();
 	void doCreate(string id, int px, int py, string publicKey_d,string publicKey_n);
@@ -97,5 +97,6 @@ public:
 	void doCompare2(string sourceId, list<string> &msgList);
 	void doVotes(string sourceId, int vote);
 	void doVotes2(string sourceId, int voteSum);
+	void doBox(int minNumber, list<string> &userList);
 };
 #endif /* defined(__GAMELAYER_H__) */

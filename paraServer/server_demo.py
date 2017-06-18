@@ -4,11 +4,16 @@ from flask import Flask
 from flask_sockets import Sockets
 import json
 from random import randint, shuffle
+import util
 
 app = Flask(__name__)
 sockets = Sockets(app)
 name_ws_dict = {}
 name_list = []
+box_name_key = {}
+util.MinNumber = 3
+util.Equipment = 54321
+tuples = util.generateTuples(10)
 
 
 class User:
@@ -57,6 +62,18 @@ def echo_socket(ws):
             action_vote(sender, msg, ws)
         elif action == 'votes2':
             action_vote2(sender, msg, ws)
+        elif action == 'box':
+            action_box(sender, msg, ws)
+
+key_name_list = []
+def action_box(sender, msg, ws):
+    if sender in box_name_key.keys():
+        return
+    box_name_key[sender] = msg['key']
+
+    key_name_list.append(sender)
+    jd = {'action': 'box', 'msg': {"users": key_name_list, 'minNum': util.MinNumber}}
+    send_broadcast(json.dumps(jd))
 
 
 def action_vote(sender, msg, ws):
@@ -96,6 +113,8 @@ def remove_ws(ws):
         del name_ws_dict[key_to_remove]
         name_list.remove(key_to_remove)
         action_remove(key_to_remove)
+        if key_to_remove in box_name_key.keys():
+            del box_name_key[key_to_remove]
 
 
 def get_init_pos():
@@ -109,10 +128,6 @@ def get_init_pos():
                 flag = True
                 break
     return x, y
-
-
-def get_box_secret():
-    return 1, 1  # add code later...
 
 
 def action_remove(id_to_remove):
@@ -133,7 +148,7 @@ def action_login(sender, msg, ws):
     ws.send(json.dumps(tmp_jd))
     level = randint(1, 10)
     x, y = get_init_pos()
-    bx, by = get_box_secret()
+    bx, by = tuples[len(name_list)]
     name_list.append(sender)
     name_ws_dict[sender] = User(sender, ws, msg['d'], msg['n'], x, y, bx, by, level)
     jd = {'action': 'create', 'msg': {}}

@@ -209,7 +209,6 @@ void GameLayer::onOpen(cocos2d::network::WebSocket* ws)
 	string d, n;
 	me->getPublicKey(d, n);
 	sendLogin(name, d, n);
-
 }
  
 // 接收消息处理函数
@@ -251,6 +250,9 @@ void GameLayer::onMessage(cocos2d::network::WebSocket* ws, const cocos2d::networ
 		}
 		else if (strcmp(action, "votes2") == 0){
 			recvVotes2(doc["msg"].GetObjectW());
+		}
+		else if (strcmp(action, "box")== 0){
+			recvBox(doc["msg"].GetObjectW());
 		}
 		
 }
@@ -427,6 +429,23 @@ void GameLayer::sendVotes2(int voteSum){
 	sendMessage(buffer.GetString());
 }
 
+void GameLayer::sendBox(int key){
+	Document doc;
+	Document::AllocatorType& allocator = doc.GetAllocator();
+	doc.SetObject();
+	string tempStr = me->getID();
+	doc.AddMember("id", JsonValue(StringRef(tempStr.c_str())).Move(), allocator);
+	doc.AddMember("action", JsonValue("box").Move(), allocator);
+	Document msg;
+	msg.SetObject();
+	msg.AddMember("key", JsonValue(key).Move(), msg.GetAllocator());
+	doc.AddMember("msg", msg, allocator);
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	doc.Accept(writer);
+	sendMessage(buffer.GetString());
+}
+
 void GameLayer::recvLogin2(JsonValue msg){
 	JsonValue users = msg["users"].GetArray();
 	userCount = 0;
@@ -493,6 +512,16 @@ void GameLayer::recvVotes2(JsonValue msg){
 	string sourceId = msg["source"].GetString();
 	int voteSum = msg["voteSum"].GetInt();
 	doVotes2(sourceId, voteSum);
+}
+
+void GameLayer::recvBox(JsonValue msg){
+	int minNum = msg["minNum"].GetInt();
+	JsonValue users = msg["users"].GetArray();
+	list<string> userList;
+	for (SizeType i = 0; i < users.Size();i++){
+		userList.push_back(users[i].GetString());
+	}
+	doBox(minNum, userList);
 }
 
 void GameLayer::doLogin2(){
@@ -588,4 +617,8 @@ void GameLayer::doVotes(string sourceId, int vote){
 void GameLayer::doVotes2(string sourceId, int voteSum){
 	CCLOG("doVotes2:%s,%d", sourceId.c_str(), voteSum);
 
+}
+
+void GameLayer::doBox(int minNumber, list<string> &userList){
+	CCLOG("doBox:%d,%s",minNumber, userList.front().c_str());
 }
