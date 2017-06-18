@@ -12,11 +12,13 @@ GameLayer::~GameLayer()
 	closeSocket();
 }
 
-Scene* GameLayer::createScene()
+Scene* GameLayer::createScene(string id)
 {
 	auto scene = Scene::create();
 	auto layer = GameLayer::create();
 	scene->addChild(layer);
+	layer->me = new ParaBoy();
+	layer->me->setId(id);
 	return scene;
 }
 
@@ -53,6 +55,7 @@ bool GameLayer::init()
 	//me->setPosition(0, 0);
 	//this->addChild(me, 1);
 
+	//init box
 
 	// bind touch event实现触摸效果
 	auto touchListener = EventListenerTouchOneByOne::create();
@@ -187,16 +190,15 @@ void GameLayer::onOpen(cocos2d::network::WebSocket* ws)
 {
     CCLOG("OnOpen");
 	srand(time(0));
-	std::string name = StringUtils::format("wxy%d", rand() % 100);
-	me = new ParaBoy();
-	me->setId(name);
+	//std::string name = StringUtils::format("wxy%d", rand() % 100);
+	string name = me->getID();
+	//me = new ParaBoy();
+	//me->setId(name);
 	me->initRSA();
 	string d, n;
 	me->getPublicKey(d, n);
 	sendLogin(name, d, n);
-	//sendMove(5, 5);
-	//sendAuth(me->getID(), "asjdhgfalkdjshfgaskdhfakldsfhakdfhlaldshf");
-	//sendAuth2(name, "kljhlkhasdkflhasdjhflkjsflkdhsfagsdsfhlja");
+
 }
  
 // 接收消息处理函数

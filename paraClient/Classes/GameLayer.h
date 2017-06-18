@@ -24,7 +24,9 @@ public:
 	GameLayer();
 	~GameLayer();
 
-	static Scene* createScene();
+	static Scene* createScene(string id);
+	//static string id;
+
 	CREATE_FUNC(GameLayer);
 	void createButton(Ref * pSender, string id);
 	void onIdentify(Ref* pSender, string sender, string receiver);
@@ -49,6 +51,7 @@ private:
 	MenuItemImage* buttonIdentify;
 	MenuItemImage* buttonCompare;
 	MenuItemImage* buttonOpenBox;
+	MenuItemImage* box;
 	int userCount;
 	unordered_map<string, ParaBoy*> idMap;
 	void jsonTest();
