@@ -14,8 +14,7 @@ box_name_key = {}
 util.MinNumber = 3
 util.Equipment = 54321
 tuples = util.generateTuples(10)
-
-
+level_list = []
 class User:
     def __init__(self, id, ws, pub_d, pub_n, p_x, p_y, b_x, b_y, level=1):
         self.ws = ws
@@ -105,10 +104,14 @@ def action_compare2(sender, msg, ws):
 
 def remove_ws(ws):
     key_to_remove = None
+    level_list.clear()
     for (k, v) in name_ws_dict.items():
         if v.ws == ws:
             print(k, " closed!")
             key_to_remove = k
+        else:
+            level_list.append(v.level)
+
     if key_to_remove is not None:
         del name_ws_dict[key_to_remove]
         name_list.remove(key_to_remove)
@@ -132,7 +135,15 @@ def get_init_pos():
 
 def action_remove(id_to_remove):
     jd = {'action': 'remove', 'msg': {'id': id_to_remove}}
+
     send_broadcast(json.dumps(jd))
+
+
+def get_level():
+    l = randint(1,10)
+    while l in level_list:
+        l = randint(1,10)
+    return l
 
 
 def action_login(sender, msg, ws):
@@ -146,11 +157,12 @@ def action_login(sender, msg, ws):
     tmp_jd = {'action': 'login2', 'msg': {}}
     tmp_jd["msg"]["users"] = user_list
     ws.send(json.dumps(tmp_jd))
-    level = randint(1, 10)
+    level = get_level()
     x, y = get_init_pos()
     bx, by = tuples[len(name_list)]
     name_list.append(sender)
     name_ws_dict[sender] = User(sender, ws, msg['d'], msg['n'], x, y, bx, by, level)
+    level_list.append(level)
     jd = {'action': 'create', 'msg': {}}
     jd['msg']['id'] = sender
     jd['msg']['x'], jd['msg']['y'] = x, y
