@@ -37,27 +37,46 @@ vector<BigNum> millionDealMessage(int level,pair<BigNum, BigNum> privateKey,BigN
 	vector<BigNum>yu;
 	RSA rsa;
 	for (int u = 1; u <= N; u++) {
-		BigNum temp = rsa.decrypt(BigNum(receiveMessage+u) ,privateKey.second,privateKey.first);
+		BigNum temp = rsa.decrypt(BigNum(receiveMessage + u), privateKey.second, privateKey.first);
 		yu.push_back(temp);
 	}
 	//生成一个长度为(p/2)bit的素数
-	BigNum* p = Utils::getPrime(N/2);
+	BigNum* p = Utils::getPrime(N / 2);
 	//BigNum* p =new BigNum("27803");
 	vector<BigNum>zu;
 	//将p值放入返回值之中
 	zu.push_back(*p);
-	for (int i = 0; i < yu.size(); i++) {
-		BigNum temp = yu[i] % (*p);
-		if ((i + 1) <= level) {
+
+	bool flag = true;
+	while (flag) {
+		for (int i = 0; i < yu.size(); i++) {
+			BigNum temp = yu[i] % (*p);
+			if (flag && i > 0 && temp != zu[zu.size() - 1]) {
+				flag = false;
+			}
 			zu.push_back(temp);
 		}
-		else {
-			zu.push_back((temp+1)%(*p));
+		if (flag) {
+			p = Utils::getPrime(N / 2);
+			zu.clear();
+			zu.push_back(*p);
 		}
-		cout << "i:" << i << "   " << zu[i] << endl;
 	}
 
-	return zu;
+	vector<BigNum>wu;
+	wu.push_back(*p);
+	for (int i = 0; i < yu.size(); i++) {
+		BigNum temp = zu[i + 1];
+		if ((i + 1) <= level) {
+			wu.push_back(temp);
+		}
+		else {
+			wu.push_back((temp + 1) % (*p));
+		}
+	}
+
+	return wu;
+
 }
 /*
 Bob根据Alice返回给自己的消息,判断自己是否比Alice富有

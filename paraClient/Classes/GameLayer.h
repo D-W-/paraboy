@@ -90,7 +90,7 @@ public:
 	void recvBox(JsonValue msg);
 	// response actions
 	void doLogin2();
-	void doCreate(string id, int px, int py, string publicKey_d,string publicKey_n, int level);
+	void doCreate(string id, int x, int y, string d, string n, int level);
 	void doMove(string id, int px, int py);
 	void doAuth(string sourceId, string authMsg);
 	void doAuth2(string sourceId, string auth2Msg);

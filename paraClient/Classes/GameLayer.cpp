@@ -36,7 +36,7 @@ bool GameLayer::init()
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Point origin = Director::getInstance()->getVisibleOrigin();
 	//±³¾°³õÊ¼»¯
-	gameBackground= Sprite::create("bg.jpg");
+	gameBackground= Sprite::create("bg1.png");
 	gameBackground->setPosition(Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 	this->addChild(gameBackground, 0);
 
@@ -61,7 +61,7 @@ bool GameLayer::init()
 	this->addChild(label, 1);
 
 	//init box
-	box = ParaBoy::create("gold.jpg", "goldb.jpg", CC_CALLBACK_1(GameLayer::createOpenBoxButton, this));
+	box = ParaBoy::create("gold.png", "goldb.png", CC_CALLBACK_1(GameLayer::createOpenBoxButton, this));
 	box->setPosition(144, 144);
 	this->menu->addChild(box, 1);
 
@@ -146,8 +146,11 @@ Vec2 GameLayer::toRealLocation(int x, int y)
 
 void GameLayer::createButton(Ref* pSender, string id)
 {
-	if (me->getID() == id)
+	ParaBoy* current = idMap[id];
+	this->label->setString("ID:" + id + " Level: " + to_string(current->getLevel()));
+	if (me->getID() == id) {
 		return;
+	}
 	string temp = "sender: " + me->getID() + "rev:" + id;
 	CCLOG(temp.c_str());
 	if (buttonIdentify == NULL) {
@@ -551,7 +554,7 @@ void GameLayer::doCreate(string id, int x, int y, string d, string n, int level)
 	CCLOG("doCreate:%s,%d,%d,%s,%s", id.c_str(), x, y, d.c_str(), n.c_str());
 	stringstream ss;
 	ss << userCount;
-	string userImage = "icon" + ss.str() + ".jpg", backImage = "icon" + ss.str() + "b.jpg";
+	string userImage = "icon" + ss.str() + ".png", backImage = "icon" + ss.str() + "b.png";
 	ParaBoy* current = ParaBoy::create(userImage, backImage, CC_CALLBACK_1(GameLayer::createButton, this, id));
 	if (id == me->getID()) {
 		string e = me->getPrivateKey();
@@ -564,6 +567,7 @@ void GameLayer::doCreate(string id, int x, int y, string d, string n, int level)
 	current->setPublicKey(d, n);
 	current->setPosition(toRealLocation(x, y));
 	current->setLevel(level);
+	current->setCode(x, y);
 	this->menu->addChild(current, 1);
 
 	idMap[id] = current;
@@ -652,6 +656,9 @@ void GameLayer::doBox(int minNumber, list<string> &userList){
 		this->label->setString("OpenSuccessful");
 		this->box->removeFromParentAndCleanup(true);
 		this->box = NULL;
+		this->box = ParaBoy::create("golda.png", "golda.png", CC_CALLBACK_1(GameLayer::createOpenBoxButton, this));
+		this->box->setPosition(144, 144);
+		this->menu->addChild(box, 1);
 	}
 
 }
