@@ -30,7 +30,7 @@ bool BeginLayer::init()
 	_editName->setFontSize(25);
 	_editName->setFontColor(Color3B::WHITE);
 	_editName->setPlaceholderFontColor(Color3B::WHITE);
-	_editName->setMaxLength(8);
+	_editName->setMaxLength(10);
 	_editName->setReturnType(ui::EditBox::KeyboardReturnType::DONE);
 	_editName->setDelegate(this);
 	addChild(_editName);

@@ -153,6 +153,19 @@ void GameLayer::createButton(Ref* pSender, string id)
 	}
 	string temp = "sender: " + me->getID() + "rev:" + id;
 	CCLOG(temp.c_str());
+
+	if (buttonIdentify != NULL) {
+		buttonIdentify->removeFromParentAndCleanup(true);
+		buttonIdentify = NULL;
+	}
+	if (buttonCompare != NULL) {
+		buttonCompare->removeFromParentAndCleanup(true);
+		buttonCompare = NULL;
+	}
+	if (buttonOpenBox != NULL) {
+		buttonOpenBox->removeFromParentAndCleanup(true);
+		buttonOpenBox = NULL;
+	}
 	if (buttonIdentify == NULL) {
 		buttonIdentify = MenuItemImage::create("button0.png", "button0b.png", CC_CALLBACK_1(GameLayer::onIdentify, this, me->getID(), id));
 		buttonIdentify->setPosition(600, 100);
@@ -182,7 +195,8 @@ void GameLayer::onIdentify(Ref * pSender, string sender, string receiver)
 
 void GameLayer::onCompare(Ref * pSender, string sender, string receiver)
 {
-	CCLOG("Clikcked compare");
+	string temp = "sender: " + sender + "rev:" + receiver;
+	CCLOG(temp.c_str());
 	String msg = "";
 	ParaBoy* bob = idMap[sender], *alice = idMap[receiver];
 	string d, n;
@@ -608,7 +622,7 @@ void GameLayer::doRemove(string id)
 }
 
 void GameLayer::doCompare(string sourceId, string compMsg){
-	CCLOG("doCompare:%s,%s", sourceId.c_str(), compMsg.c_str());
+	CCLOG("doCompare:%s,%s,%s", sourceId.c_str(), compMsg.c_str(), me->getID().c_str());
 	string pe = me->getPrivateKey(), pn, pd;
 	me->getPublicKey(pd, pn);
 	BigNum* e = new BigNum(pe), *n = new BigNum(pn);
