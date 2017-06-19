@@ -468,7 +468,7 @@ void GameLayer::recvLogin2(JsonValue msg){
 	JsonValue users = msg["users"].GetArray();
 	userCount = 0;
 	for (SizeType i = 0; i < users.Size(); i++){
-		doCreate(users[i]["id"].GetString(), users[i]["x"].GetInt(), users[i]["y"].GetInt(), users[i]["d"].GetString(), users[i]["n"].GetString());
+		doCreate(users[i]["id"].GetString(), users[i]["x"].GetInt(), users[i]["y"].GetInt(), users[i]["d"].GetString(), users[i]["n"].GetString(), users[i]["level"].GetInt());
 	}
 }
 
@@ -478,7 +478,8 @@ void GameLayer::recvCreate(JsonValue msg){
 	int y = msg["y"].GetInt();
 	string d = msg["d"].GetString();
 	string n = msg["n"].GetString();
-	doCreate(c_id, x, y, d, n);
+	int level = msg["level"].GetInt();
+	doCreate(c_id, x, y, d, n, level);
 	//CCLOG(c_id.getCString());
 }
 void GameLayer::recvMove(JsonValue msg){
@@ -546,7 +547,7 @@ void GameLayer::doLogin2(){
 
 }
 
-void GameLayer::doCreate(string id, int x, int y, string d, string n){
+void GameLayer::doCreate(string id, int x, int y, string d, string n, int level){
 	CCLOG("doCreate:%s,%d,%d,%s,%s", id.c_str(), x, y, d.c_str(), n.c_str());
 	stringstream ss;
 	ss << userCount;
@@ -562,6 +563,7 @@ void GameLayer::doCreate(string id, int x, int y, string d, string n){
 	current->setId(id);
 	current->setPublicKey(d, n);
 	current->setPosition(toRealLocation(x, y));
+	current->setLevel(level);
 	this->menu->addChild(current, 1);
 
 	idMap[id] = current;
